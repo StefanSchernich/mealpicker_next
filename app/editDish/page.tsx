@@ -9,18 +9,38 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function EditDishPage({
-  params,
+  searchParams,
 }: {
-  params: { dishID: string };
+  searchParams: {
+    id: string;
+    title: string;
+    imgUrl?: string;
+    category: string;
+    calories: string;
+    difficulty: string;
+    ingredients?: string[];
+  };
 }) {
+  const {
+    id,
+    title: qryTitle,
+    imgUrl: qryImgUrl,
+    category: qryCategory,
+    calories: qryCalories,
+    difficulty: qryDifficulty,
+    ingredients: qryIngredients,
+  } = searchParams;
+
   // TODO: korrekten initialState für Editieren eintragen
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [calories, setCalories] = useState("");
-  const [difficulty, setDifficulty] = useState("");
-  const [ingredients, setIngredients] = useState<string[]>([""]);
+  const [title, setTitle] = useState(qryTitle);
+  const [category, setCategory] = useState(qryCategory);
+  const [calories, setCalories] = useState(qryCalories);
+  const [difficulty, setDifficulty] = useState(qryDifficulty);
+  const [ingredients, setIngredients] = useState<string[]>(
+    qryIngredients ? qryIngredients : [""],
+  );
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [imgSrc, setImgSrc] = useState("");
+  const [imgSrc, setImgSrc] = useState(qryImgUrl ? qryImgUrl : "");
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -65,7 +85,7 @@ export default function EditDishPage({
     });
   }
 
-  function resetAllStates() {
+  function resetDishStates() {
     setTitle("");
     setCategory("");
     setCalories("");
@@ -124,11 +144,12 @@ export default function EditDishPage({
       });
     }
 
-    // 3: Invoke the server action with the finalized form data. The action adds recipe to db
+    // 3: Invoke the server action with the finalized form data. The action updates the dish in the db
     try {
+      // TODO: Replace the 'add' action with 'edit' action
       const result = await addDishToDb(formData); // result is id of newDish if successfully added to db, or error message if not
       // TODO: Do something with the id and handle the error... like display the message "Erfolgreich hinzugefügt, jetzt ansehen?" und scrolle zur Message mit scrollIntoView
-      resetAllStates();
+      resetDishStates();
     } catch (error: any) {
       // this fires if the server action itself (not the interaction with the db) throws an error
       console.error("Server action failed:", error.message);
@@ -173,7 +194,6 @@ export default function EditDishPage({
 
   return (
     <>
-      Edit Dish Page {params.dishID}
       <h1 className="mt-6 text-2xl font-bold">Gericht editieren</h1>
       <form
         className="flex flex-col gap-8"
@@ -280,7 +300,7 @@ export default function EditDishPage({
         <input
           type="submit"
           className="grow cursor-pointer rounded-3xl border-2 bg-slate-100 px-4 py-2 text-black"
-          value="Hochladen"
+          value="Aktualisieren"
         />
       </form>
     </>

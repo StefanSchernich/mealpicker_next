@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { getArrayFromSessionStorage, toggleDish } from "@/utils/utils";
+import Link from "next/link";
 
 type DishCardProps = {
   retrievedDish: RetrievedRecipe;
@@ -10,7 +11,7 @@ type DishCardProps = {
   setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export default function DishCard({
-  retrievedDish: retrievedDish,
+  retrievedDish,
   isImageLoaded,
   setIsImageLoaded,
 }: DishCardProps) {
@@ -102,6 +103,28 @@ export default function DishCard({
         ))}
       </ul>
       {/* //TODO: Add Edit / Delete / Lookup links to DishCard */}
+      <div className="flex flex-col gap-4">
+        <Link href={`https://www.chefkoch.de/rs/s0/${title}/Rezepte.html`}>
+          Ähnliche Gerichte auf Chefkoch finden 🔎
+        </Link>
+        <Link
+          href={{
+            pathname: `/editDish/`,
+            query: {
+              id,
+              title,
+              imgUrl,
+              category,
+              calories,
+              difficulty,
+              ingredients,
+            },
+          }}
+        >
+          Gericht editieren ✏️
+        </Link>
+        <Link href={`/deleteDish/${id}`}>Gericht löschen ❌</Link>
+      </div>
     </div>
   );
 }

@@ -99,7 +99,7 @@ export default function Filter({
         currentId = retrievedDish._id;
       }
       // Make the API call to get a new dish
-      const res = await axios.postForm("/api/recipe", formData);
+      const res = await axios.postForm("/api/fetchRandomRecipe", formData);
 
       // if no dish is found with given filter, change state and show message to user
       if (res.data.message === "No dish found with given filter") {
