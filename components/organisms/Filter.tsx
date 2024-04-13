@@ -93,17 +93,16 @@ export default function Filter({
     try {
       let currentId: string | undefined;
 
-      // If there is a recipe in state (= it's not the first time the submit button is clicked), get its id
+      // If there is a recipe in state (= it's not the first time the submit button is clicked), get its id for now to compare it to the new one later
       if (retrievedDish) {
         // here 'retrivedDish' is the former dish before a new one is fetched
         currentId = retrievedDish._id;
       }
       // Make the API call to get a new dish
       const res = await axios.postForm("/api/recipe", formData);
-      console.log(res.data);
 
       // if no dish is found with given filter, change state and show message to user
-      if (!res.data) {
+      if (res.data.message === "No dish found with given filter") {
         setRetrievedDish(null);
         setNoDishWithGivenFilter(true);
         return;

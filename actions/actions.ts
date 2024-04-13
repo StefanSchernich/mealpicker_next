@@ -14,6 +14,12 @@ type NewDish = {
 import { connectToDb, Recipe } from "@/db/db";
 import { FormDataObj } from "@/types/types";
 
+/**
+ * Add a new dish to the database based on the provided form data.
+ *
+ * @param {FormData} formData - The form data containing information about the new dish.
+ * @return {object} The _id of the newly created dish if successful, otherwise an error message.
+ */
 export async function addDishToDb(formData: FormData) {
   // console.log("formData IN action / run on server: ", formData); TODO: remove console.log once development is completed
 

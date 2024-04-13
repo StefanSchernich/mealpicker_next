@@ -2,8 +2,9 @@ import { Recipe, connectToDb } from "@/db/db";
 
 import type { FilterObj } from "@/types/types";
 import { generateFilter } from "@/utils/utils";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   // extract body from request formData
   const formData = await request.formData();
 
@@ -30,9 +31,11 @@ export async function POST(request: Request) {
       { $sample: { size: 1 } },
     ]);
     const randomDish = sampleAggregate[0]; // might be null if no dish matching filter is found
-    return Response.json(randomDish);
+    return randomDish
+      ? NextResponse.json(randomDish)
+      : NextResponse.json({ message: "No dish found with given filter" });
   } catch (error) {
     console.error(error);
-    return Response.json(error);
+    return NextResponse.json(error);
   }
 }

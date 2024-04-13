@@ -155,8 +155,8 @@ export default function IndexPage() {
       )}
 
       {noDishWithGivenFilter && (
-        <Notification ref={noDishFoundComponentRef} type={"noDishFound"}>
-          Kein Gericht gefunden
+        <Notification ref={noDishFoundComponentRef} type="fail">
+          Kein Gericht mit diesen Kriterien gefunden.
         </Notification>
       )}
 

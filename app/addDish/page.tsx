@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
-import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
+import { useState, useEffect, useRef } from "react";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
+import Notification from "@/components/atoms/Notification";
+import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import axios from "axios";
 import Image from "next/image";
@@ -16,6 +17,9 @@ export default function AddDish() {
   const [ingredients, setIngredients] = useState<string[]>([""]);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [imgSrc, setImgSrc] = useState("");
+  const [uploadOutcome, setUploadOutcome] = useState("");
+
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -60,16 +64,6 @@ export default function AddDish() {
     });
   }
 
-  function resetAllStates() {
-    setTitle("");
-    setCategory("");
-    setCalories("");
-    setDifficulty("");
-    setIngredients([""]);
-    setPreviewVisible(false);
-    setImgSrc("");
-  }
-
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // default: refresh of entire page
 
@@ -82,6 +76,7 @@ export default function AddDish() {
         await axios.get(imgSrc, { responseType: "blob" })
       ).data as File;
 
+      // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
       try {
         // 1b: Get signedRequest and URL of uploaded image from AWS
         const {
@@ -91,6 +86,7 @@ export default function AddDish() {
         // console.log("uploadedImgUrlInAWS", uploadedImgUrlInAWS); // TODO: remove in production
         imgUrl = uploadedImgUrlInAWS;
         // 1c: Upload the image file to the signedRequest URL provided by AWS
+        // TODO: Include image compression
         await uploadFile(imgFromObjectURL, signedRequest);
       } catch (error: any) {
         console.error(
@@ -122,41 +118,58 @@ export default function AddDish() {
     // 3: Invoke the server action with the finalized form data. The action adds recipe to db
     try {
       const result = await addDishToDb(formData); // result is id of newDish if successfully added to db, or error message if not
+      if ("_id" in result) {
+        const { _id: id } = result;
+        setUploadOutcome("success");
+      }
+      if ("error" in result) {
+        setUploadOutcome("fail");
+      }
       // TODO: Do something with the id and handle the error... like display the message "Erfolgreich hinzugefügt, jetzt ansehen?" und scrolle zur Message mit scrollIntoView
-      resetAllStates();
+      resetDishStates();
     } catch (error: any) {
       // this fires if the server action itself (not the interaction with the db) throws an error
       console.error("Server action failed:", error.message);
     }
+  }
 
-    // Helper Function for Submitting / File Upload to AWS S3
-    /**
-     * Retrieves a signed request from the server for uploading a file to AWS S3.
-     *
-     * @param {globalThis.File | null} file - The file to be uploaded
-     * @return {AxiosResponse} The response containing a "data" object, which contains the signedRequest (= URL with embedded credentials) for the file upload and the URL of the uploaded file in AWS S3
-     */
-    async function getSignedRequest(file: globalThis.File | null) {
-      if (!file) throw new Error("Keine Datei ausgewählt");
-      const response = await axios.get(
-        `api/sign-s3?file-name=${file.name}&file-type=${file.type}`,
-      );
-      return response;
-    }
+  function resetDishStates() {
+    setTitle("");
+    setCategory("");
+    setCalories("");
+    setDifficulty("");
+    setIngredients([""]);
+    setPreviewVisible(false);
+    setImgSrc("");
+  }
 
-    /**
-     * Uploads the image file to the URL signed by AWS.
-     *
-     * @param {globalThis.File} file - image file to be uploaded
-     * @param {string} signedRequest - the signed URL for the file upload
-     * @param {string} url - the URL of the uploaded file
-     */
-    async function uploadFile(
-      file: globalThis.File,
-      signedRequest: string,
-    ): Promise<void> {
-      await axios.put(signedRequest, file); // signedRequest is an AWS S3 URL with embedded credentials
-    }
+  // Helper Function for Submitting / File Upload to AWS S3
+  /**
+   * Retrieves a signed request from the server for uploading a file to AWS S3.
+   *
+   * @param {globalThis.File | null} file - The file to be uploaded
+   * @return {AxiosResponse} The response containing a "data" object, which contains the signedRequest (= URL with embedded credentials) for the file upload and the URL of the uploaded file in AWS S3
+   */
+  async function getSignedRequest(file: globalThis.File | null) {
+    if (!file) throw new Error("Keine Datei ausgewählt");
+    const response = await axios.get(
+      `api/sign-s3?file-name=${file.name}&file-type=${file.type}`,
+    );
+    return response;
+  }
+
+  /**
+   * Uploads the image file to the URL signed by AWS.
+   *
+   * @param {globalThis.File} file - image file to be uploaded
+   * @param {string} signedRequest - the signed URL for the file upload
+   * @param {string} url - the URL of the uploaded file
+   */
+  async function uploadFile(
+    file: globalThis.File,
+    signedRequest: string,
+  ): Promise<void> {
+    await axios.put(signedRequest, file); // signedRequest is an AWS S3 URL with embedded credentials
   }
 
   // Einblenden von Preview nur, wenn ein Bild vorhanden ist
@@ -165,6 +178,13 @@ export default function AddDish() {
       setPreviewVisible(true);
     }
   }, [imgSrc]);
+
+  // if no dish is found in DB with given filter, scroll to Notification component
+  useEffect(() => {
+    if (uploadOutcome) {
+      notificationRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [uploadOutcome]);
 
   return (
     <>
@@ -277,6 +297,17 @@ export default function AddDish() {
           value="Hochladen"
         />
       </form>
+
+      {uploadOutcome === "success" && (
+        <Notification ref={notificationRef} type="success">
+          Gericht erfolgreich hinzugefügt.
+        </Notification>
+      )}
+      {uploadOutcome === "fail" && (
+        <Notification ref={notificationRef} type="fail">
+          Fehler beim Hinzufügen.
+        </Notification>
+      )}
     </>
   );
 }
