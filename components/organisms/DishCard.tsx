@@ -73,6 +73,7 @@ export default function DishCard({
           cursor={"pointer"}
         />
       </div>
+      {/* TODO: TODO: Remove once development is complete */}
       <p>{id}</p>
       {imgUrl && (
         <div
@@ -88,17 +89,18 @@ export default function DishCard({
           />
         </div>
       )}
-
       <div className="flex gap-12">
         <p>{category}</p>
         <p>{calories}</p>
         <p>{difficulty}</p>
       </div>
+      {/* TODO: Replace ingredient list items with Badges (as on Tailwind Homepage)? */}
       <ul className="list-inside list-disc space-y-2">
         {ingredients?.map((ingredient, index) => (
           <li key={`ingredient-${index}`}>{ingredient}</li>
         ))}
       </ul>
+      {/* //TODO: Add Edit / Delete / Lookup links to DishCard */}
     </div>
   );
 }

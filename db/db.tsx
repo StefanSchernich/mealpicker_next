@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import aws from "aws-sdk";
-aws.config.region = "eu-central-1";
 
 export async function connectToDb() {
   mongoose

@@ -22,11 +22,17 @@ export async function POST(request: Request) {
   const finalizedFilter = generateFilter(filterObj);
 
   // make DB call
-  await connectToDb();
-  const sampleAggregate = await Recipe.aggregate([
-    { $match: finalizedFilter },
-    { $sample: { size: 1 } },
-  ]);
-  const randomDish = sampleAggregate[0];
-  return Response.json(randomDish);
+  try {
+    await connectToDb();
+    // run filter on dishes and select one random dish (= what "sample" does)
+    const sampleAggregate = await Recipe.aggregate([
+      { $match: finalizedFilter },
+      { $sample: { size: 1 } },
+    ]);
+    const randomDish = sampleAggregate[0]; // might be null if no dish matching filter is found
+    return Response.json(randomDish);
+  } catch (error) {
+    console.error(error);
+    return Response.json(error);
+  }
 }
