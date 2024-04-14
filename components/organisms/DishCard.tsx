@@ -29,6 +29,7 @@ export default function DishCard({
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
 
+  // #region Effects
   useEffect(() => {
     recipeCardRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [retrievedDish]);
@@ -61,9 +62,9 @@ export default function DishCard({
     sessionStorage.setItem("likedDishes", JSON.stringify(updatedDishes));
     window.dispatchEvent(new Event("storage")); // manually fire "storage" event, because by default storage event is only fired when *another* tab changes storage
   }
-
+  // #region return
   return (
-    <div ref={recipeCardRef} className="space-y-8">
+    <div ref={recipeCardRef} className="mt-8 space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>
         <Heart
@@ -94,7 +95,7 @@ export default function DishCard({
         <p>{calories}</p>
         <p>{difficulty}</p>
       </div>
-      {/* TODO: Replace ingredient list items with Badges (as on Tailwind Homepage)? */}
+      {/* STYLE: Replace ingredient list items with Badges (as on Tailwind Homepage)? */}
       <ul className="list-inside list-disc space-y-2">
         {ingredients?.map((ingredient, index) => (
           <li key={`ingredient-${index}`}>{ingredient}</li>

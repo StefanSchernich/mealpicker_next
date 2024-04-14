@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Providers from "@/components/Providers/Providers";
 import { Inter, Lumanosimo } from "next/font/google";
-import "./globals.css";
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 const lumanosimo = Lumanosimo({ subsets: ["latin"], weight: "400" });
@@ -32,7 +33,9 @@ export default function RootLayout({
             </Link>
           </nav>
         </header>
-        <main className="flex flex-col gap-10 p-4">{children}</main>
+        <main className="flex flex-col gap-10 p-4">
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   );
