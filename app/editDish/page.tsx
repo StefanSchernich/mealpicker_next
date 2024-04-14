@@ -9,6 +9,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import imageCompression from "browser-image-compression";
 
 export default function EditDishPage({
   searchParams,
@@ -113,16 +114,23 @@ export default function EditDishPage({
         await axios.get(imgSrc, { responseType: "blob" })
       ).data as File;
 
+      // Compress the file before uploading it to AWS S3
+      const compressedImg: File = await imageCompression(imgFromObjectURL, {
+        maxSizeMB: 0.5,
+      });
+
+      // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
       try {
         // 1b: Get signedRequest and URL of uploaded image from AWS
         const {
           data: { signedRequest, uploadedImgUrlInAWS },
-        } = await getSignedRequest(imgFromObjectURL);
+        }: { data: { signedRequest: string; uploadedImgUrlInAWS: string } } =
+          await getSignedRequest(compressedImg);
         // console.log("signedRequest", signedRequest);
         // console.log("uploadedImgUrlInAWS", uploadedImgUrlInAWS); // TODO: remove in production
         imgUrl = uploadedImgUrlInAWS;
         // 1c: Upload the image file to the signedRequest URL provided by AWS
-        await uploadFile(imgFromObjectURL, signedRequest);
+        await uploadFile(compressedImg, signedRequest);
       } catch (error: any) {
         console.error(
           "There has been an error trying to upload the image:",

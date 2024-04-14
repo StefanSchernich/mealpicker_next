@@ -10,7 +10,7 @@ import {
   ingredientOptions,
 } from "@/data/data";
 import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
-import { RetrievedRecipe as RetrievedDish } from "@/app/page";
+import { RetrievedDish as RetrievedDish } from "@/app/page";
 import { trimFreetextSearchTerms } from "@/utils/utils";
 import axios from "axios";
 
@@ -67,8 +67,11 @@ export default function Filter({
   setNoDishWithGivenFilter,
   setIsImageLoaded,
 }: FilterProps) {
+  // #region Submit Handler
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    // clear previous dish (so that loading animation of new dish can be shown)
+    setRetrievedDish(null);
 
     const formData = new FormData();
     // only append non-falsy values and non-empty array

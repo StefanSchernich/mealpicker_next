@@ -7,7 +7,7 @@ import { getArrayFromSessionStorage } from "@/utils/utils";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 
-export type RetrievedRecipe = {
+export type RetrievedDish = {
   _id: string;
   title: string;
   imgUrl?: string;
@@ -18,13 +18,14 @@ export type RetrievedRecipe = {
 };
 
 export default function IndexPage() {
+  // #region States, Refs
   const [category, setCategory] = useState("");
   const [calories, setCalories] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [ingrFilterVisible, setIngrFilterVisible] = useState(false);
   const [ingSearchTerms, setIngSearchTerms] = useState([""]);
   const [ingredients, setIngredients] = useState<string[]>([]);
-  const [retrievedDish, setRetrievedDish] = useState<RetrievedRecipe | null>(
+  const [retrievedDish, setRetrievedDish] = useState<RetrievedDish | null>(
     null,
   );
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -33,6 +34,7 @@ export default function IndexPage() {
 
   const noDishFoundComponentRef = useRef<HTMLDivElement>(null);
 
+  // #region Handlers
   function handleCategoryChange(e: React.ChangeEvent<HTMLInputElement>) {
     setCategory(e.target.value);
   }
@@ -102,6 +104,7 @@ export default function IndexPage() {
     setIngSearchTerms([""]);
   }
 
+  // #region Effects
   useEffect(() => {
     window.addEventListener("storage", () => {
       setNumberOfLikedDishes(getArrayFromSessionStorage("likedDishes").length);
@@ -121,7 +124,7 @@ export default function IndexPage() {
       noDishFoundComponentRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [noDishWithGivenFilter]);
-
+  // #region return
   return (
     <>
       <Filter

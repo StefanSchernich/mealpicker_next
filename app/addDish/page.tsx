@@ -8,6 +8,7 @@ import axios from "axios";
 import Image from "next/image";
 import { trimFreetextSearchTerms } from "@/utils/utils";
 import { addDishToDb } from "@/actions/actions";
+import imageCompression from "browser-image-compression";
 
 export default function AddDish() {
   // #region States, Refs and Effects
@@ -78,18 +79,23 @@ export default function AddDish() {
         await axios.get(imgSrc, { responseType: "blob" })
       ).data as File;
 
+      // Compress the file before uploading it to AWS S3
+      const compressedImg: File = await imageCompression(imgFromObjectURL, {
+        maxSizeMB: 0.5,
+      });
+
       // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
       try {
         // 1b: Get signedRequest and URL of uploaded image from AWS
         const {
           data: { signedRequest, uploadedImgUrlInAWS },
-        } = await getSignedRequest(imgFromObjectURL);
+        }: { data: { signedRequest: string; uploadedImgUrlInAWS: string } } =
+          await getSignedRequest(compressedImg);
         // console.log("signedRequest", signedRequest);
         // console.log("uploadedImgUrlInAWS", uploadedImgUrlInAWS); // TODO: remove in production
         imgUrl = uploadedImgUrlInAWS;
         // 1c: Upload the image file to the signedRequest URL provided by AWS
-        // TODO: Include image compression
-        await uploadFile(imgFromObjectURL, signedRequest);
+        await uploadFile(compressedImg, signedRequest);
       } catch (error: any) {
         console.error(
           "There has been an error trying to upload the image:",

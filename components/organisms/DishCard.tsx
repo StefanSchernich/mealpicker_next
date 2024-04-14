@@ -1,4 +1,4 @@
-import { RetrievedRecipe } from "@/app/page";
+import { RetrievedDish } from "@/app/page";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
@@ -6,7 +6,7 @@ import { getArrayFromSessionStorage, toggleDish } from "@/utils/utils";
 import Link from "next/link";
 
 type DishCardProps = {
-  retrievedDish: RetrievedRecipe;
+  retrievedDish: RetrievedDish;
   isImageLoaded: boolean;
   setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -74,8 +74,6 @@ export default function DishCard({
           cursor={"pointer"}
         />
       </div>
-      {/* TODO: TODO: Remove once development is complete */}
-      <p>{id}</p>
       {imgUrl && (
         <div
           className={`relative h-auto min-h-60 w-full max-w-96 overflow-hidden rounded-3xl
