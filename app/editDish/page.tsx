@@ -1,12 +1,14 @@
 "use client";
-import { addDishToDb } from "@/actions/actions";
+import { editDishInDb } from "@/actions/actions";
 import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
+import Notification from "@/components/atoms/Notification";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { trimFreetextSearchTerms } from "@/utils/utils";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function EditDishPage({
   searchParams,
@@ -31,7 +33,7 @@ export default function EditDishPage({
     ingredients: qryIngredients,
   } = searchParams;
 
-  // TODO: korrekten initialState für Editieren eintragen
+  // #region States, Refs
   const [title, setTitle] = useState(qryTitle);
   const [category, setCategory] = useState(qryCategory);
   const [calories, setCalories] = useState(qryCalories);
@@ -41,6 +43,9 @@ export default function EditDishPage({
   );
   const [previewVisible, setPreviewVisible] = useState(false);
   const [imgSrc, setImgSrc] = useState(qryImgUrl ? qryImgUrl : "");
+  const [editOutcome, setEditOutcome] = useState("");
+
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -95,6 +100,7 @@ export default function EditDishPage({
     setImgSrc("");
   }
 
+  // #region Submit Handler
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // default: refresh of entire page
 
@@ -130,6 +136,7 @@ export default function EditDishPage({
     const sanitizedIngredients = trimFreetextSearchTerms(ingredients);
 
     // 2a: only append non-falsy values and non-empty array; none of the following should be null, however, since they are all required inputs
+    formData.append("id", id);
     title && formData.append("title", title);
     imgUrl && formData.append("imgUrl", imgUrl);
     category && formData.append("category", category);
@@ -147,9 +154,15 @@ export default function EditDishPage({
     // 3: Invoke the server action with the finalized form data. The action updates the dish in the db
     try {
       // TODO: Replace the 'add' action with 'edit' action
-      const result = await addDishToDb(formData); // result is id of newDish if successfully added to db, or error message if not
+      const result = await editDishInDb(formData); // result is id of editedDish if edit was successful, or error message if not
       // TODO: Do something with the id and handle the error... like display the message "Erfolgreich hinzugefügt, jetzt ansehen?" und scrolle zur Message mit scrollIntoView
-      resetDishStates();
+      if ("_id" in result) {
+        const { _id: id } = result;
+        setEditOutcome("success");
+      }
+      if ("error" in result) {
+        setEditOutcome("fail");
+      }
     } catch (error: any) {
       // this fires if the server action itself (not the interaction with the db) throws an error
       console.error("Server action failed:", error.message);
@@ -184,7 +197,7 @@ export default function EditDishPage({
       await axios.put(signedRequest, file); // signedRequest is an AWS S3 URL with embedded credentials
     }
   }
-
+  // #region Effects
   // Einblenden von Preview nur, wenn ein Bild vorhanden ist
   useEffect(() => {
     if (imgSrc) {
@@ -192,6 +205,14 @@ export default function EditDishPage({
     }
   }, [imgSrc]);
 
+  // scroll to Notification component after adding
+  useEffect(() => {
+    if (editOutcome) {
+      notificationRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [editOutcome]);
+
+  // #region Start of 'return'
   return (
     <>
       <h1 className="mt-6 text-2xl font-bold">Gericht editieren</h1>
@@ -303,6 +324,16 @@ export default function EditDishPage({
           value="Aktualisieren"
         />
       </form>
+      {editOutcome === "success" && (
+        <Notification ref={notificationRef} type="success">
+          Gericht erfolgreich editiert.
+        </Notification>
+      )}
+      {editOutcome === "fail" && (
+        <Notification ref={notificationRef} type="fail">
+          Fehler beim Hinzufügen.
+        </Notification>
+      )}
     </>
   );
 }

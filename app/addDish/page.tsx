@@ -10,6 +10,7 @@ import { trimFreetextSearchTerms } from "@/utils/utils";
 import { addDishToDb } from "@/actions/actions";
 
 export default function AddDish() {
+  // #region States, Refs and Effects
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [calories, setCalories] = useState("");
@@ -64,6 +65,7 @@ export default function AddDish() {
     });
   }
 
+  // #region Submit Handler
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // default: refresh of entire page
 
@@ -121,6 +123,7 @@ export default function AddDish() {
       if ("_id" in result) {
         const { _id: id } = result;
         setUploadOutcome("success");
+        resetDishStates();
       }
       if ("error" in result) {
         setUploadOutcome("fail");
@@ -132,6 +135,7 @@ export default function AddDish() {
       console.error("Server action failed:", error.message);
     }
   }
+  // #endregion
 
   function resetDishStates() {
     setTitle("");
@@ -179,13 +183,14 @@ export default function AddDish() {
     }
   }, [imgSrc]);
 
-  // if no dish is found in DB with given filter, scroll to Notification component
+  // scroll to Notification component after adding
   useEffect(() => {
     if (uploadOutcome) {
       notificationRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [uploadOutcome]);
 
+  // #region Start of 'return'
   return (
     <>
       <h1 className="mt-6 text-2xl font-bold">Neues Gericht</h1>

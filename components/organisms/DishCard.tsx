@@ -102,7 +102,6 @@ export default function DishCard({
           <li key={`ingredient-${index}`}>{ingredient}</li>
         ))}
       </ul>
-      {/* //TODO: Add Edit / Delete / Lookup links to DishCard */}
       <div className="flex flex-col gap-4">
         <Link href={`https://www.chefkoch.de/rs/s0/${title}/Rezepte.html`}>
           Ähnliche Gerichte auf Chefkoch finden 🔎

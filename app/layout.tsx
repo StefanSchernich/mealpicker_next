@@ -1,4 +1,3 @@
-// TODO: Replace favicon
 import type { Metadata } from "next";
 import { Inter, Lumanosimo } from "next/font/google";
 import "./globals.css";
