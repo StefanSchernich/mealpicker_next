@@ -81,7 +81,7 @@ export default function AddDish() {
 
       // Compress the file before uploading it to AWS S3
       const compressedImg: File = await imageCompression(imgFromObjectURL, {
-        maxSizeMB: 0.5,
+        maxSizeMB: 0.15,
       });
 
       // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
@@ -91,8 +91,6 @@ export default function AddDish() {
           data: { signedRequest, uploadedImgUrlInAWS },
         }: { data: { signedRequest: string; uploadedImgUrlInAWS: string } } =
           await getSignedRequest(compressedImg);
-        // console.log("signedRequest", signedRequest);
-        // console.log("uploadedImgUrlInAWS", uploadedImgUrlInAWS); // TODO: remove in production
         imgUrl = uploadedImgUrlInAWS;
         // 1c: Upload the image file to the signedRequest URL provided by AWS
         await uploadFile(compressedImg, signedRequest);

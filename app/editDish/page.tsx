@@ -8,7 +8,6 @@ import { trimFreetextSearchTerms } from "@/utils/utils";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import imageCompression from "browser-image-compression";
 
 export default function EditDishPage({
@@ -21,7 +20,7 @@ export default function EditDishPage({
     category: string;
     calories: string;
     difficulty: string;
-    ingredients?: string[];
+    ingredients?: string | string[];
   };
 }) {
   const {
@@ -40,7 +39,7 @@ export default function EditDishPage({
   const [calories, setCalories] = useState(qryCalories);
   const [difficulty, setDifficulty] = useState(qryDifficulty);
   const [ingredients, setIngredients] = useState<string[]>(
-    qryIngredients ? qryIngredients : [""],
+    qryIngredients && Array.isArray(qryIngredients) ? qryIngredients : [""], // if there is only one ingredient in the query string, qryIngrediensts is a string, so convert it to an array so ingredients.map(...) works
   );
   const [previewVisible, setPreviewVisible] = useState(false);
   const [imgSrc, setImgSrc] = useState(qryImgUrl ? qryImgUrl : "");
@@ -116,7 +115,7 @@ export default function EditDishPage({
 
       // Compress the file before uploading it to AWS S3
       const compressedImg: File = await imageCompression(imgFromObjectURL, {
-        maxSizeMB: 0.5,
+        maxSizeMB: 0.15,
       });
 
       // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
@@ -126,8 +125,6 @@ export default function EditDishPage({
           data: { signedRequest, uploadedImgUrlInAWS },
         }: { data: { signedRequest: string; uploadedImgUrlInAWS: string } } =
           await getSignedRequest(compressedImg);
-        // console.log("signedRequest", signedRequest);
-        // console.log("uploadedImgUrlInAWS", uploadedImgUrlInAWS); // TODO: remove in production
         imgUrl = uploadedImgUrlInAWS;
         // 1c: Upload the image file to the signedRequest URL provided by AWS
         await uploadFile(compressedImg, signedRequest);
