@@ -136,14 +136,12 @@ export default function AddDish() {
         if ("error" in result) {
           setUploadOutcome("fail");
         }
-        // TODO: Do something with the id and handle the error... like display the message "Erfolgreich hinzugefügt, jetzt ansehen?" und scrolle zur Message mit scrollIntoView
         resetDishStates();
       } catch (error: any) {
         // this fires if the server action itself (not the interaction with the db) throws an error
         console.error("Server action failed:", error.message);
       }
     });
-    console.log("TRANSITION FINISHED");
   }
   // #endregion
 
@@ -205,7 +203,7 @@ export default function AddDish() {
     <>
       <h1 className="mt-2 text-2xl font-bold">Neues Gericht</h1>
       <form
-        className="mt-4 flex flex-col gap-8"
+        className="mt-6 flex flex-col gap-8"
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
           // Enter soll neue Input-Zeile erzeugen, nicht Formular submitten
@@ -222,7 +220,7 @@ export default function AddDish() {
           <input
             type="text"
             placeholder="Gericht"
-            className="px-2 py-1 text-black"
+            className="text-blackfocus:outline-none px-2 py-1"
             id="title"
             name="title"
             value={title}
@@ -237,6 +235,11 @@ export default function AddDish() {
           </label>
           <input
             type="file"
+            className="file:mr-4 file:rounded-full file:border-0
+            file:bg-gray-100 file:px-4
+            file:py-2 file:text-sm
+            file:font-semibold file:text-black
+            hover:file:bg-gray-200"
             id="dishImage"
             onChange={handleMealImgChange}
             accept="image/*"

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent } from "react";
+import React, { FormEvent, useTransition } from "react";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import FilterOptionCheckbox from "@/components/atoms/FilterOptionCheckbox";
 import {
@@ -13,6 +13,7 @@ import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
 import { RetrievedDish as RetrievedDish } from "@/app/page";
 import { trimFreetextSearchTerms } from "@/utils/utils";
 import axios from "axios";
+import SubmitBtn from "../atoms/SubmitBtn";
 
 type FilterProps = {
   category: string;
@@ -67,90 +68,97 @@ export default function Filter({
   setNoDishWithGivenFilter,
   setIsImageLoaded,
 }: FilterProps) {
+  const [isPending, startTransition] = useTransition();
+
   // #region Submit Handler
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
+    // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
     e.preventDefault();
-    // clear previous dish (so that loading animation of new dish can be shown)
-    setRetrievedDish(null);
 
-    const formData = new FormData();
-    // only append non-falsy values and non-empty array
-    category && formData.append("category", category);
-    calories && formData.append("calories", calories);
-    difficulty && formData.append("difficulty", difficulty);
+    startTransition(async () => {
+      // clear previous dish (so that loading animation of new dish can be shown)
+      setRetrievedDish(null);
 
-    // combine checked and freetext ingredients in one array
-    let checkedAndTextIngredients = [
-      ...ingredients,
-      ...trimFreetextSearchTerms(ingSearchTerms),
-    ];
+      const formData = new FormData();
+      // only append non-falsy values and non-empty array
+      category && formData.append("category", category);
+      calories && formData.append("calories", calories);
+      difficulty && formData.append("difficulty", difficulty);
 
-    // FormData does NOT allow arrays as values
-    // --> add each string separately under same key (which is allowed; array can be recovered by formData.getAll method) if there are any ingredients
-    if (checkedAndTextIngredients.length > 0) {
-      checkedAndTextIngredients.forEach((ingredient) => {
-        formData.append("ingredients", ingredient);
-      });
-    }
+      // combine checked and freetext ingredients in one array
+      let checkedAndTextIngredients = [
+        ...ingredients,
+        ...trimFreetextSearchTerms(ingSearchTerms),
+      ];
 
-    try {
-      let currentId: string | undefined;
-
-      // If there is a recipe in state (= it's not the first time the submit button is clicked), get its id for now to compare it to the new one later
-      if (retrievedDish) {
-        // here 'retrivedDish' is the former dish before a new one is fetched
-        currentId = retrievedDish._id;
-      }
-      // Make the API call to get a new dish
-      const res = await axios.postForm("/api/fetchRandomRecipe", formData);
-
-      // if no dish is found with given filter, change state and show message to user
-      if (res.data.message === "No dish found with given filter") {
-        setRetrievedDish(null);
-        setNoDishWithGivenFilter(true);
-        return;
+      // FormData does NOT allow arrays as values
+      // --> add each string separately under same key (which is allowed; array can be recovered by formData.getAll method) if there are any ingredients
+      if (checkedAndTextIngredients.length > 0) {
+        checkedAndTextIngredients.forEach((ingredient) => {
+          formData.append("ingredients", ingredient);
+        });
       }
 
-      // if a dish is found, hide the "NoDishFound" Notification
-      setNoDishWithGivenFilter(false);
+      try {
+        let currentId: string | undefined;
 
-      const newDish = res.data;
-      const newDishId = newDish._id;
+        // If there is a recipe in state (= it's not the first time the submit button is clicked), get its id for now to compare it to the new one later
+        if (retrievedDish) {
+          // here 'retrivedDish' is the former dish before a new one is fetched
+          currentId = retrievedDish._id;
+        }
+        // Make the API call to get a new dish
+        const res = await axios.postForm("/api/fetchRandomRecipe", formData);
 
-      // if the new dish is the same as the old one, no changes are necessary --> return
-      if (newDishId === currentId) return;
+        // if no dish is found with given filter, change state and show message to user
+        if (res.data.message === "No dish found with given filter") {
+          setRetrievedDish(null);
+          setNoDishWithGivenFilter(true);
+          return;
+        }
 
-      // else reset ImageLoad state (so that placeholder is shown again until new dish image is fetched) and set the new dish in state
-      setIsImageLoaded(false);
-      setRetrievedDish(newDish);
-    } catch (error) {
-      console.error(error);
-    }
-    // Reset state so that Image Placeholer (= pulsing div) is shown again when recipe changes and image of *new* recipe has to be loaded;
-    // otherwise, image of old recipe will be shown and no need to load the placeholder animation
+        // if a dish is found, hide the "NoDishFound" Notification
+        setNoDishWithGivenFilter(false);
 
-    //TODO: Handle Enter Keypress -> decide whether to submit form or add another freetext search term
-    // Event-Listener für "Enter"
-    // useEffect(() => {
-    //   function handleEnter(e: KeyboardEvent) {
-    //     if (e.key === "Enter") {
-    //       handleSubmit(e);
-    //     }
-    //   }
+        const newDish = res.data;
+        const newDishId = newDish._id;
 
-    //   document.addEventListener("keydown", handleEnter);
-    //   return () => document.removeEventListener("keydown", handleEnter);
-    // });
+        // if the new dish is the same as the old one, no changes are necessary --> return
+        if (newDishId === currentId) return;
 
-    // Resette Filter beim Mounting / Rückkehr von Rezeptseiten
-    // useEffect(() => {
-    //   setCategory("");
-    //   setCalories("");
-    //   setDifficulty("");
-    //   setIngredients([]);
-    //   setIngSearchTerms([""]);
-    // }, []);
+        // else reset ImageLoad state (so that placeholder is shown again until new dish image is fetched) and set the new dish in state
+        setIsImageLoaded(false);
+        setRetrievedDish(newDish);
+      } catch (error) {
+        console.error(error);
+      }
+      // Reset state so that Image Placeholer (= pulsing div) is shown again when recipe changes and image of *new* recipe has to be loaded;
+      // otherwise, image of old recipe will be shown and no need to load the placeholder animation
+
+      //TODO: Handle Enter Keypress -> decide whether to submit form or add another freetext search term
+      // Event-Listener für "Enter"
+      // useEffect(() => {
+      //   function handleEnter(e: KeyboardEvent) {
+      //     if (e.key === "Enter") {
+      //       handleSubmit(e);
+      //     }
+      //   }
+
+      //   document.addEventListener("keydown", handleEnter);
+      //   return () => document.removeEventListener("keydown", handleEnter);
+      // });
+
+      // Resette Filter beim Mounting / Rückkehr von Rezeptseiten
+      // useEffect(() => {
+      //   setCategory("");
+      //   setCalories("");
+      //   setDifficulty("");
+      //   setIngredients([]);
+      //   setIngSearchTerms([""]);
+      // }, []);
+    });
   };
+
   return (
     <>
       {
@@ -242,11 +250,7 @@ export default function Filter({
             //#region Buttons
           }
           <div className="flex gap-4">
-            <input
-              type="submit"
-              className="grow cursor-pointer rounded-3xl border-2 bg-slate-100 px-4 py-2 text-black"
-              value="Suchen"
-            />
+            <SubmitBtn isPending={isPending} actionVerb="Suchen" />
             <button
               className="grow rounded-3xl border-2 px-4 py-2"
               onClick={handleFilterFormReset}

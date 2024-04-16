@@ -93,16 +93,6 @@ export default function EditDishPage({
     });
   }
 
-  function resetDishStates() {
-    setTitle("");
-    setCategory("");
-    setCalories("");
-    setDifficulty("");
-    setIngredients([""]);
-    setPreviewVisible(false);
-    setImgSrc("");
-  }
-
   // #region Submit Handler
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // default: refresh of entire page
@@ -225,7 +215,7 @@ export default function EditDishPage({
     <>
       <h1 className="mt-2 text-2xl font-bold">Gericht editieren</h1>
       <form
-        className="mt-4 flex flex-col gap-8"
+        className="mt-6 flex flex-col gap-8"
         onSubmit={handleSubmit}
         onKeyDown={(e) => {
           // TODO: Enter soll neue Input-Zeile erzeugen, nicht Formular submitten
@@ -256,6 +246,11 @@ export default function EditDishPage({
             Bild
           </label>
           <input
+            className="file:mr-4 file:rounded-full file:border-0
+          file:bg-gray-100 file:px-4
+          file:py-2 file:text-sm
+          file:font-semibold file:text-black
+          hover:file:bg-gray-200"
             type="file"
             id="dishImage"
             onChange={handleMealImgChange}
@@ -325,7 +320,6 @@ export default function EditDishPage({
             />
           ))}
         </div>
-        {/* TODO: useFormStatus hook nutzen, um "pending" anzeigen zu können --> Input Komponente extrahieren  */}
         <SubmitBtn isPending={isPending} actionVerb="Aktualisieren" />
       </form>
       {editOutcome === "success" && (

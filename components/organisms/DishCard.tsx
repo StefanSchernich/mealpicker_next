@@ -4,6 +4,8 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 import { getArrayFromSessionStorage, toggleDish } from "@/utils/utils";
 import Link from "next/link";
+import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
+import { getIcon } from "@/utils/utils";
 
 type DishCardProps = {
   retrievedDish: RetrievedDish;
@@ -90,22 +92,26 @@ export default function DishCard({
           />
         </div>
       )}
-      <div className="flex gap-12">
-        <p>{category}</p>
-        <p>{calories}</p>
-        <p>{difficulty}</p>
+      <div className="flex gap-12 *:text-2xl">
+        <p>{getIcon(category, categoryOptions)}</p>
+        <p>{getIcon(calories, caloryOptions)}</p>
+        <p>{getIcon(difficulty, difficultyOptions)}</p>
       </div>
       {/* STYLE: Replace ingredient list items with Badges (as on Tailwind Homepage)? */}
-      <ul className="list-inside list-disc space-y-2">
+      <ul className="flex flex-wrap gap-2 *:inline *:rounded-full *:bg-gray-900 *:px-3 *:py-1 *:text-white">
         {ingredients?.map((ingredient, index) => (
           <li key={`ingredient-${index}`}>{ingredient}</li>
         ))}
       </ul>
-      <div className="flex flex-col gap-4">
-        <Link href={`https://www.chefkoch.de/rs/s0/${title}/Rezepte.html`}>
-          Ähnliche Gerichte auf Chefkoch finden 🔎
+      <div className="flex flex-col items-start gap-4">
+        <Link
+          className="inline-block rounded-full bg-gray-300 px-3 py-2 text-black"
+          href={`https://www.chefkoch.de/rs/s0/${title}/Rezepte.html`}
+        >
+          Auf Chefkoch suchen 🔎
         </Link>
         <Link
+          className="inline-block rounded-full bg-gray-300 px-3 py-2 text-black"
           href={{
             pathname: `/editDish/`,
             query: {
@@ -121,7 +127,13 @@ export default function DishCard({
         >
           Gericht editieren ✏️
         </Link>
-        <Link href={`/deleteDish/${id}`}>Gericht löschen ❌</Link>
+        <Link
+          className="inline-block rounded-full bg-gray-300 px-3 py-2 text-black"
+          href={`/deleteDish/${id}`}
+        >
+          {/* // TODO: Implement Delete logic */}
+          Gericht löschen ❌
+        </Link>
       </div>
     </div>
   );
