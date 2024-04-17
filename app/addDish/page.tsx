@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useRef, useTransition } from "react";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import Notification from "@/components/atoms/Notification";

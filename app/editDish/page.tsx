@@ -1,3 +1,4 @@
+"use client"
 import { editDishInDb } from "@/actions/actions";
 import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
