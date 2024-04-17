@@ -6,15 +6,18 @@ import { getArrayFromSessionStorage, toggleDish } from "@/utils/utils";
 import Link from "next/link";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { getIcon } from "@/utils/utils";
+import { deleteDishFromDb } from "@/actions/actions";
 
 type DishCardProps = {
   retrievedDish: RetrievedDish;
   isImageLoaded: boolean;
+  setRetrievedDish: (dish: RetrievedDish | null) => void;
   setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export default function DishCard({
   retrievedDish,
   isImageLoaded,
+  setRetrievedDish,
   setIsImageLoaded,
 }: DishCardProps) {
   // Create ref to scroll to once Recipe is loaded
@@ -66,7 +69,10 @@ export default function DishCard({
   }
   // #region return
   return (
-    <div ref={recipeCardRef} className="mt-8 space-y-8">
+    <div
+      ref={recipeCardRef}
+      className="container mt-12 max-w-[500px] space-y-8"
+    >
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>
         <Heart
@@ -92,7 +98,7 @@ export default function DishCard({
           />
         </div>
       )}
-      <div className="flex gap-12 *:text-2xl">
+      <div className="flex justify-center gap-12 *:text-2xl">
         <p>{getIcon(category, categoryOptions)}</p>
         <p>{getIcon(calories, caloryOptions)}</p>
         <p>{getIcon(difficulty, difficultyOptions)}</p>
@@ -103,15 +109,18 @@ export default function DishCard({
           <li key={`ingredient-${index}`}>{ingredient}</li>
         ))}
       </ul>
-      <div className="flex flex-col items-start gap-4">
+      {
+        //#region Buttons
+      }
+      <div className="flex justify-center gap-4">
         <Link
-          className="inline-block rounded-full bg-gray-300 px-3 py-2 text-black"
+          className="inline-block rounded-full bg-gray-600 px-6 py-2 text-black hover:bg-gray-400"
           href={`https://www.chefkoch.de/rs/s0/${title}/Rezepte.html`}
         >
-          Auf Chefkoch suchen 🔎
+          🔎
         </Link>
         <Link
-          className="inline-block rounded-full bg-gray-300 px-3 py-2 text-black"
+          className="inline-block rounded-full bg-gray-600 px-6 py-2 text-black hover:bg-gray-400"
           href={{
             pathname: `/editDish/`,
             query: {
@@ -125,15 +134,18 @@ export default function DishCard({
             },
           }}
         >
-          Gericht editieren ✏️
+          ✏️
         </Link>
         <Link
-          className="inline-block rounded-full bg-gray-300 px-3 py-2 text-black"
+          className="inline-block rounded-full bg-gray-600 px-6 py-2 text-black hover:bg-gray-400"
           href={`/deleteDish/${id}`}
-        >
-          {/* // TODO: Implement Delete logic */}
-          Gericht löschen ❌
-        </Link>
+          onClick={(e) => {
+            e.preventDefault();
+            if (window.confirm("Möchtest du dieses Rezept wirklich löschen?"))
+              deleteDishFromDb(id);
+            setRetrievedDish(null); // Hide dish card after deleting
+          }}
+        ></Link>
       </div>
     </div>
   );

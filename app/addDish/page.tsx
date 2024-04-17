@@ -73,7 +73,6 @@ export default function AddDish() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // default: refresh of entire page
     startTransition(async () => {
-      console.log("TRANSITION STARTED");
       // 1: If image was uploaded in input, upload it to AWS S3 and get the URL of the uploaded image in AWS
       let imgUrl = "";
 
@@ -220,7 +219,7 @@ export default function AddDish() {
           <input
             type="text"
             placeholder="Gericht"
-            className="text-blackfocus:outline-none px-2 py-1"
+            className="px-2 py-1 text-black"
             id="title"
             name="title"
             value={title}

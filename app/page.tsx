@@ -154,6 +154,7 @@ export default function IndexPage() {
           retrievedDish={retrievedDish}
           isImageLoaded={isImageLoaded}
           setIsImageLoaded={setIsImageLoaded}
+          setRetrievedDish={setRetrievedDish}
         />
       )}
 
