@@ -141,9 +141,10 @@ export default function DishCard({
           href={`/deleteDish/${id}`}
           onClick={(e) => {
             e.preventDefault();
-            if (window.confirm("Möchtest du dieses Rezept wirklich löschen?"))
+            if (window.confirm("Möchtest du dieses Rezept wirklich löschen?")) {
               deleteDishFromDb(id);
-            setRetrievedDish(null); // Hide dish card after deleting
+              setRetrievedDish(null); // Hide dish card after deleting
+            }
           }}
         ></Link>
       </div>

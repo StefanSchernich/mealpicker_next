@@ -88,7 +88,10 @@ export async function editDishInDb(formData: FormData) {
  * @return {Promise<void>} A Promise that resolves when the dish is successfully deleted.
  */
 export async function deleteDishFromDb(id: string) {
-  console.log("Deleting now: ", id);
   await connectToDb();
-  await Recipe.findByIdAndDelete(id);
+  try {
+    await Recipe.findByIdAndDelete(id);
+  } catch (error) {
+    console.error(error);
+  }
 }
