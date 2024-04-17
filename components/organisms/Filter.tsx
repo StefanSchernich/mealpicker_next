@@ -1,5 +1,3 @@
-"use client";
-
 import React, { FormEvent, useTransition } from "react";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import FilterOptionCheckbox from "@/components/atoms/FilterOptionCheckbox";

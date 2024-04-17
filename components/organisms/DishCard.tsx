@@ -1,4 +1,3 @@
-"use client";
 import { RetrievedDish } from "@/app/page";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -146,7 +145,9 @@ export default function DishCard({
               setRetrievedDish(null); // Hide dish card after deleting
             }
           }}
-        ></Link>
+        >
+          ❌
+        </Link>
       </div>
     </div>
   );
