@@ -1,3 +1,4 @@
+"use client";
 import { RetrievedDish } from "@/app/page";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -103,7 +104,6 @@ export default function DishCard({
         <p>{getIcon(calories, caloryOptions)}</p>
         <p>{getIcon(difficulty, difficultyOptions)}</p>
       </div>
-      {/* STYLE: Replace ingredient list items with Badges (as on Tailwind Homepage)? */}
       <ul className="flex flex-wrap gap-2 *:inline *:rounded-full *:bg-gray-900 *:px-3 *:py-1 *:text-white">
         {ingredients?.map((ingredient, index) => (
           <li key={`ingredient-${index}`}>{ingredient}</li>
