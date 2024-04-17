@@ -1,4 +1,4 @@
-import type { FilterObj } from "@/types/types";
+import type { Dish, FilterObj } from "@/types/types";
 
 /**
  * Trims leading and trailing whitespace from each search term in the input array.
@@ -37,25 +37,27 @@ export function generateFilter(reqFilterObj: FilterObj) {
 }
 
 /**
- * Gets array from session storage (items in session storage are saved as strings) and returns it parsed as object
- * @param {string} key - key of item in session storage
- * @returns array object
+ * Retrieves an array of liked dishes from session storage.
+ *
+ * @param {string} key - The key used to store the liked dishes in session storage.
+ * @return {Dish[]} An array of liked dishes. If no liked dishes are found, an empty array is returned.
  */
-export function getArrayFromSessionStorage(key: string): string[] {
+export function getLikedDishesFromSessionStorage(key: string): Dish[] {
   return JSON.parse(sessionStorage.getItem(key) || "[]");
 }
 
 /**
- * Toggle (add if not present, remove if present) a dish in array of dishes
- * @param {Array} dishes - array of dishes
- * @param {string} id - id of dish to toggle
- * @returns updated array of dishes
+ * Toggles the presence of a dish in the list of favorite dishes.
+ *
+ * @param {Dish[]} favDishes - The list of favorite dishes.
+ * @param {Dish} dish - The dish to toggle.
+ * @return {Dish[]} The updated list of favorite dishes.
  */
-export function toggleDish(dishes: string[], id: string) {
-  if (dishes.includes(id)) {
-    return dishes.filter((dish) => dish !== id);
+export function toggleDish(favDishes: Dish[], dish: Dish) {
+  if (favDishes.some((favDish) => favDish._id === dish._id)) {
+    return favDishes.filter((favDish) => favDish._id !== dish._id);
   } else {
-    return [...dishes, id];
+    return [...favDishes, dish];
   }
 }
 

@@ -3,7 +3,7 @@ import Notification from "@/components/atoms/Notification";
 import Filter from "@/components/organisms/Filter";
 import DishCard from "@/components/organisms/DishCard";
 import { useEffect, useRef, useState } from "react";
-import { getArrayFromSessionStorage } from "@/utils/utils";
+import { getLikedDishesFromSessionStorage } from "@/utils/utils";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 
@@ -107,12 +107,14 @@ export default function IndexPage() {
   // #region Effects
   useEffect(() => {
     window.addEventListener("storage", () => {
-      setNumberOfLikedDishes(getArrayFromSessionStorage("likedDishes").length);
+      setNumberOfLikedDishes(
+        getLikedDishesFromSessionStorage("likedDishes").length,
+      );
     });
     return () => {
       window.removeEventListener("storage", () => {
         setNumberOfLikedDishes(
-          getArrayFromSessionStorage("likedDishes").length,
+          getLikedDishesFromSessionStorage("likedDishes").length,
         );
       });
     };

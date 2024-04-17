@@ -10,3 +10,13 @@ export type FilterObj = {
 export type FormDataObj = {
   [k: string]: FormDataEntryValue | FormDataEntryValue[];
 };
+
+export type Dish = {
+  _id: string;
+  title: string;
+  imgUrl?: string;
+  category: string;
+  calories: string;
+  difficulty: string;
+  ingredients?: string[];
+};

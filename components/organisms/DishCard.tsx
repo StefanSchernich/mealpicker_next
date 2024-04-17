@@ -1,17 +1,18 @@
-import { RetrievedDish } from "@/app/page";
+import { Dish } from "@/types/types";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Heart } from "lucide-react";
-import { getArrayFromSessionStorage, toggleDish } from "@/utils/utils";
+import { ChefHat, Heart, Pencil, Trash2 } from "lucide-react";
+import { getLikedDishesFromSessionStorage, toggleDish } from "@/utils/utils";
 import Link from "next/link";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { getIcon } from "@/utils/utils";
 import { deleteDishFromDb } from "@/actions/actions";
+import { DisableHttpEndpointResponse } from "aws-sdk/clients/rds";
 
 type DishCardProps = {
-  retrievedDish: RetrievedDish;
+  retrievedDish: Dish;
   isImageLoaded: boolean;
-  setRetrievedDish: (dish: RetrievedDish | null) => void;
+  setRetrievedDish: (dish: Dish | null) => void;
   setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export default function DishCard({
@@ -41,19 +42,31 @@ export default function DishCard({
 
   useEffect(() => {
     // On initial render: Check if the dish is already liked
-    setIsLiked(getArrayFromSessionStorage("likedDishes").includes(id));
+    setIsLiked(
+      getLikedDishesFromSessionStorage("likedDishes").some(
+        (favDish) => favDish._id === retrievedDish._id,
+      ),
+    );
 
     // Update state when recipe is (un-)liked
     window.addEventListener("storage", () => {
-      setIsLiked(getArrayFromSessionStorage("likedDishes").includes(id));
+      setIsLiked(
+        getLikedDishesFromSessionStorage("likedDishes").some(
+          (favDish) => favDish._id === retrievedDish._id,
+        ),
+      );
     });
 
     return () => {
       window.removeEventListener("storage", () =>
-        setIsLiked(getArrayFromSessionStorage("likedDishes").includes(id)),
+        setIsLiked(
+          getLikedDishesFromSessionStorage("likedDishes").some(
+            (favDish) => favDish._id === retrievedDish._id,
+          ),
+        ),
       );
     };
-  }, [id]);
+  }, [retrievedDish]);
 
   /**
    * Function to toggle the like status of a dish in sessionStorage
@@ -61,9 +74,9 @@ export default function DishCard({
    * @param {string} id - the id of the dish to toggle like status
    * @return {void}
    */
-  function toggleLike(id: string) {
-    const likedDishes = getArrayFromSessionStorage("likedDishes");
-    const updatedDishes = toggleDish(likedDishes, id);
+  function toggleLike(dish: Dish) {
+    const likedDishes = getLikedDishesFromSessionStorage("likedDishes");
+    const updatedDishes = toggleDish(likedDishes, dish);
     sessionStorage.setItem("likedDishes", JSON.stringify(updatedDishes));
     window.dispatchEvent(new Event("storage")); // manually fire "storage" event, because by default storage event is only fired when *another* tab changes storage
   }
@@ -79,7 +92,7 @@ export default function DishCard({
           className="min-h-8 min-w-8"
           color="red"
           fill={`${isLiked ? "red" : "none"}`}
-          onClick={() => toggleLike(id)}
+          onClick={() => toggleLike(retrievedDish)}
           cursor={"pointer"}
         />
       </div>
@@ -116,7 +129,7 @@ export default function DishCard({
           className="inline-block rounded-full bg-gray-600 px-6 py-2 text-black hover:bg-gray-400"
           href={`https://www.chefkoch.de/rs/s0/${title}/Rezepte.html`}
         >
-          🔎
+          <ChefHat color="white" />
         </Link>
         <Link
           className="inline-block rounded-full bg-gray-600 px-6 py-2 text-black hover:bg-gray-400"
@@ -133,7 +146,7 @@ export default function DishCard({
             },
           }}
         >
-          ✏️
+          <Pencil color="white" />
         </Link>
         <Link
           className="inline-block rounded-full bg-gray-600 px-6 py-2 text-black hover:bg-gray-400"
@@ -146,7 +159,7 @@ export default function DishCard({
             }
           }}
         >
-          ❌
+          <Trash2 color="white" />
         </Link>
       </div>
     </div>
