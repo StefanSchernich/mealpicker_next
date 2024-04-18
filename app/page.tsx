@@ -63,8 +63,25 @@ export default function IndexPage() {
     });
   }
 
-  function handleTextSearchAdd() {
-    setIngSearchTerms((prevState) => [...prevState, ""]);
+  /**
+   * Handles the addition of a new search term to the ingredient search terms array.
+   *
+   * This function adds a new empty string to the `ingSearchTerms` array at the specified index. If no index is provided,
+   * the new search term is appended to the end of the array.
+   *
+   * @param {number | undefined} [index] - The index at which to insert the new search term.
+   * @return {void} This function does not return a value.
+   */
+  function handleTextSearchAdd(index?: number) {
+    if (index === undefined) {
+      setIngSearchTerms((prevState) => [...prevState, ""]);
+    } else {
+      setIngSearchTerms((prevState) => {
+        const newSearchTerms = [...prevState];
+        newSearchTerms.splice(index + 1, 0, "");
+        return newSearchTerms;
+      });
+    }
   }
 
   function handleTextSearchRemove(

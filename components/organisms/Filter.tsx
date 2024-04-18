@@ -29,7 +29,7 @@ type FilterProps = {
   }: {
     target: { value: string };
   }) => void;
-  handleTextSearchAdd: () => void;
+  handleTextSearchAdd: (index?: number) => void;
   handleTextSearchChange: (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
@@ -130,30 +130,6 @@ export default function Filter({
       } catch (error) {
         console.error(error);
       }
-      // Reset state so that Image Placeholer (= pulsing div) is shown again when recipe changes and image of *new* recipe has to be loaded;
-      // otherwise, image of old recipe will be shown and no need to load the placeholder animation
-
-      //TODO: Handle Enter Keypress -> decide whether to submit form or add another freetext search term
-      // Event-Listener für "Enter"
-      // useEffect(() => {
-      //   function handleEnter(e: KeyboardEvent) {
-      //     if (e.key === "Enter") {
-      //       handleSubmit(e);
-      //     }
-      //   }
-
-      //   document.addEventListener("keydown", handleEnter);
-      //   return () => document.removeEventListener("keydown", handleEnter);
-      // });
-
-      // Resette Filter beim Mounting / Rückkehr von Rezeptseiten
-      // useEffect(() => {
-      //   setCategory("");
-      //   setCalories("");
-      //   setDifficulty("");
-      //   setIngredients([]);
-      //   setIngSearchTerms([""]);
-      // }, []);
     });
   };
 

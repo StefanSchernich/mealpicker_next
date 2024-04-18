@@ -75,7 +75,7 @@ export default function DishCard({
   return (
     <div
       ref={recipeCardRef}
-      className="container mt-12 max-w-[500px] space-y-8"
+      className="container mt-12 max-w-[500px] scroll-mt-12 space-y-8"
     >
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>

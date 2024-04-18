@@ -8,12 +8,28 @@ type FreeTextSearchInputProps = {
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
   ) => void;
-  handleTextSearchAdd: () => void;
+  handleTextSearchAdd: (index?: number) => void;
   handleTextSearchRemove: (
     e: React.MouseEvent<SVGSVGElement>,
     index: number,
   ) => void;
 };
+
+/**
+ * Focuses on the next input element of type 'text' in the document.
+ *
+ * @return {void} This function does not return anything.
+ */
+function focusNext() {
+  const textInputs = Array.from(
+    document.querySelectorAll("input[type='text']"),
+  );
+  const currInput = document.activeElement;
+  const currInputIndex = textInputs.indexOf(currInput!);
+  const nextinputIndex = (currInputIndex + 1) % textInputs.length;
+  const input = textInputs[nextinputIndex] as HTMLInputElement;
+  input.focus();
+}
 
 export default function FreeTextSearchInput({
   value,
@@ -23,6 +39,8 @@ export default function FreeTextSearchInput({
   handleTextSearchAdd,
   handleTextSearchRemove,
 }: FreeTextSearchInputProps) {
+  console.log("listLength: ", listLength);
+  console.log("index: ", index);
   return (
     <div className="flex gap-2">
       <div className="max-w-64 grow">
@@ -32,6 +50,13 @@ export default function FreeTextSearchInput({
           placeholder="Freitext Zutat"
           value={value}
           onChange={(e) => handleTextSearchChange(e, index)}
+          onKeyDown={async (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              await handleTextSearchAdd(index);
+              focusNext();
+            }
+          }}
         />
       </div>
 
