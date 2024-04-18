@@ -8,10 +8,10 @@ import {
   ingredientOptions,
 } from "@/data/data";
 import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
-import { RetrievedDish as RetrievedDish } from "@/app/page";
 import { trimFreetextSearchTerms } from "@/utils/utils";
 import axios from "axios";
 import SubmitBtn from "../atoms/SubmitBtn";
+import type { Dish } from "@/types/types";
 
 type FilterProps = {
   category: string;
@@ -20,7 +20,7 @@ type FilterProps = {
   ingSearchTerms: string[];
   ingredients: string[];
   ingrFilterVisible: boolean;
-  retrievedDish: RetrievedDish | null;
+  retrievedDish: Dish | null;
   handleCategoryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleCaloriesChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleDifficultyChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -40,7 +40,7 @@ type FilterProps = {
   ) => void;
   handleIngFilterVisibility: (e: { preventDefault: () => void }) => void;
   handleFilterFormReset: (e: { preventDefault: () => void }) => void;
-  setRetrievedDish: (dish: RetrievedDish | null) => void;
+  setRetrievedDish: (dish: Dish | null) => void;
   setNoDishWithGivenFilter: React.Dispatch<React.SetStateAction<boolean>>;
   setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -72,7 +72,6 @@ export default function Filter({
   const handleSubmit = (e: FormEvent) => {
     // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
     e.preventDefault();
-    // FIXME: Do this before transition because it causes a flicker?
     // clear previous dish (so that loading animation of new dish can be shown)
     setRetrievedDish(null);
 
@@ -208,7 +207,9 @@ export default function Filter({
           {
             //#region Zutatenfilter
           }
-          <div className={`${ingrFilterVisible ? "visible" : "hidden"}`}>
+          <div
+            className={`overflow-hidden transition-all duration-200 ${ingrFilterVisible ? "max-h-[99999px]" : "-mb-8 max-h-0"}`} // add negative bottom margin to compensate for double gap above/below element with height:0
+          >
             <h2 className="mb-4 text-center text-xl font-bold">Zutaten</h2>
 
             {/* ### Checkbox-Zutatenfilter ### */}

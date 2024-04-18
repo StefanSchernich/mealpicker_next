@@ -6,16 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { getLikedDishesFromSessionStorage } from "@/utils/utils";
 import { Heart } from "lucide-react";
 import Link from "next/link";
-
-export type RetrievedDish = {
-  _id: string;
-  title: string;
-  imgUrl?: string;
-  category: string;
-  calories: string;
-  difficulty: string;
-  ingredients?: string[];
-};
+import type { Dish } from "@/types/types";
 
 export default function IndexPage() {
   // #region States, Refs
@@ -25,9 +16,7 @@ export default function IndexPage() {
   const [ingrFilterVisible, setIngrFilterVisible] = useState(false);
   const [ingSearchTerms, setIngSearchTerms] = useState([""]);
   const [ingredients, setIngredients] = useState<string[]>([]);
-  const [retrievedDish, setRetrievedDish] = useState<RetrievedDish | null>(
-    null,
-  );
+  const [retrievedDish, setRetrievedDish] = useState<Dish | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [noDishWithGivenFilter, setNoDishWithGivenFilter] = useState(false);
   const [numberOfLikedDishes, setNumberOfLikedDishes] = useState(0);
@@ -172,12 +161,12 @@ export default function IndexPage() {
         </Notification>
       )}
 
-      {/* TODO: Favs-Seite erstellen */}
       {numberOfLikedDishes > 0 && (
         <Link
           href="/favs"
           className="fixed bottom-3 right-3 min-h-12 min-w-12 text-2xl"
         >
+          {/* STYLE: Add animation and change size of heart */}
           <Heart fill="red" color="red" size={56} />
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[55%] text-center">
             {numberOfLikedDishes}

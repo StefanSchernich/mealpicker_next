@@ -45,12 +45,18 @@ export default function FavsCard({ dish }: { dish: Dish }) {
   return (
     <div className="flex w-full gap-4 py-2">
       <div className="relative min-h-24 min-w-24">
-        <Image
-          src={dish.imgUrl || ""}
-          alt={dish.title}
-          fill
-          className="object-cover"
-        />
+        {dish.imgUrl ? (
+          <Image
+            src={dish.imgUrl}
+            alt={dish.title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center rounded-md bg-gray-700">
+            No Image
+          </div>
+        )}
       </div>
       <div className="flex grow flex-col items-start gap-2">
         <h2 className="text-md">{dish.title}</h2>

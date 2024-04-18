@@ -16,7 +16,7 @@ export default function FilterOptionRadios({
   isRequired,
 }: FilterOptionsRadio) {
   return (
-    <div className="flex flex-col justify-center gap-2 rounded-md p-2 text-center transition-colors hover:bg-slate-700 has-[:checked]:bg-slate-700">
+    <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-gray-800 p-3 text-center transition-colors hover:bg-slate-700 has-[:checked]:bg-slate-700">
       {/* // FIXME: Fix centering */}
       <label htmlFor={value}>
         {icon} {value}
@@ -24,7 +24,7 @@ export default function FilterOptionRadios({
       <input
         type="radio"
         id={value}
-        className="text-center"
+        className="hidden"
         name={sectionName}
         value={value}
         checked={state === value}
