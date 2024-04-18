@@ -72,39 +72,40 @@ export default function Filter({
   const handleSubmit = (e: FormEvent) => {
     // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
     e.preventDefault();
+    // FIXME: Do this before transition because it causes a flicker?
+    // clear previous dish (so that loading animation of new dish can be shown)
+    setRetrievedDish(null);
+
+    const formData = new FormData();
+    // only append non-falsy values and non-empty array
+    category && formData.append("category", category);
+    calories && formData.append("calories", calories);
+    difficulty && formData.append("difficulty", difficulty);
+
+    // combine checked and freetext ingredients in one array
+    let checkedAndTextIngredients = [
+      ...ingredients,
+      ...trimFreetextSearchTerms(ingSearchTerms),
+    ];
+
+    // FormData does NOT allow arrays as values
+    // --> add each string separately under same key (which is allowed; array can be recovered by formData.getAll method) if there are any ingredients
+    if (checkedAndTextIngredients.length > 0) {
+      checkedAndTextIngredients.forEach((ingredient) => {
+        formData.append("ingredients", ingredient);
+      });
+    }
+
+    let currentId: string | undefined;
+
+    // If there is a recipe in state (= it's not the first time the submit button is clicked), get its id for now to compare it to the new one later
+    if (retrievedDish) {
+      // here 'retrivedDish' is the former dish before a new one is fetched
+      currentId = retrievedDish._id;
+    }
 
     startTransition(async () => {
-      // clear previous dish (so that loading animation of new dish can be shown)
-      setRetrievedDish(null);
-
-      const formData = new FormData();
-      // only append non-falsy values and non-empty array
-      category && formData.append("category", category);
-      calories && formData.append("calories", calories);
-      difficulty && formData.append("difficulty", difficulty);
-
-      // combine checked and freetext ingredients in one array
-      let checkedAndTextIngredients = [
-        ...ingredients,
-        ...trimFreetextSearchTerms(ingSearchTerms),
-      ];
-
-      // FormData does NOT allow arrays as values
-      // --> add each string separately under same key (which is allowed; array can be recovered by formData.getAll method) if there are any ingredients
-      if (checkedAndTextIngredients.length > 0) {
-        checkedAndTextIngredients.forEach((ingredient) => {
-          formData.append("ingredients", ingredient);
-        });
-      }
-
       try {
-        let currentId: string | undefined;
-
-        // If there is a recipe in state (= it's not the first time the submit button is clicked), get its id for now to compare it to the new one later
-        if (retrievedDish) {
-          // here 'retrivedDish' is the former dish before a new one is fetched
-          currentId = retrievedDish._id;
-        }
         // Make the API call to get a new dish
         const res = await axios.postForm("/api/fetchRandomRecipe", formData);
 

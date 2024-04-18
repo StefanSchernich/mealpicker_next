@@ -307,7 +307,6 @@ export default function AddDish() {
             />
           ))}
         </div>
-        {/* TODO: useFormStatus hook nutzen, um "pending" anzeigen zu können --> Input Komponente extrahieren  */}
         <SubmitBtn isPending={isPending} actionVerb={"Hinzufügen"} />
       </form>
 

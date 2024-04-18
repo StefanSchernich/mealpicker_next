@@ -18,12 +18,13 @@ export default function FilterOptionRadios({
   return (
     <div className="flex flex-col justify-center gap-2 rounded-md p-2 text-center transition-colors hover:bg-slate-700 has-[:checked]:bg-slate-700">
       {/* // FIXME: Fix centering */}
-      <label htmlFor={value} className="text-center">
+      <label htmlFor={value}>
         {icon} {value}
       </label>
       <input
         type="radio"
         id={value}
+        className="text-center"
         name={sectionName}
         value={value}
         checked={state === value}

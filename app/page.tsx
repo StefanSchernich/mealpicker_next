@@ -120,6 +120,12 @@ export default function IndexPage() {
     };
   });
 
+  useEffect(() => {
+    setNumberOfLikedDishes(
+      getLikedDishesFromSessionStorage("likedDishes").length,
+    );
+  }, []);
+
   // if no dish is found in DB with given filter, scroll to Notification component
   useEffect(() => {
     if (noDishWithGivenFilter) {

@@ -22,13 +22,11 @@ export default function RadioFilterSection({
   changeHandler,
   isRequired,
 }: RadioFilterSectionProps) {
-  const data = [...dataArr];
-
   return (
     <div className="flex flex-col gap-4">
       <p className="text-xl font-bold">{children}</p>
       <div className="flex gap-6">
-        {data.map(({ id, value, icon }) => {
+        {dataArr.map(({ id, value, icon }) => {
           return (
             <FilterOptionRadios
               key={id}

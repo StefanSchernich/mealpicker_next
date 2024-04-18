@@ -7,7 +7,6 @@ import Link from "next/link";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { getIcon } from "@/utils/utils";
 import { deleteDishFromDb } from "@/actions/actions";
-import { DisableHttpEndpointResponse } from "aws-sdk/clients/rds";
 
 type DishCardProps = {
   retrievedDish: Dish;
