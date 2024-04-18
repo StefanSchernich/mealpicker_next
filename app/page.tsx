@@ -161,18 +161,16 @@ export default function IndexPage() {
         </Notification>
       )}
 
-      {numberOfLikedDishes > 0 && (
-        <Link
-          href="/favs"
-          className="fixed bottom-3 right-3 min-h-12 min-w-12 text-2xl"
-        >
-          {/* STYLE: Add animation and change size of heart */}
-          <Heart fill="red" color="red" size={56} />
-          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[55%] text-center">
-            {numberOfLikedDishes}
-          </span>
-        </Link>
-      )}
+      <Link
+        href="/favs"
+        className={`fixed bottom-2 right-2 transition-all ${numberOfLikedDishes > 0 ? "opacity-100" : "translate-x-[200%] opacity-0"}`}
+      >
+        {/* STYLE: Add animation and change size of heart */}
+        <Heart fill="red" color="red" size={48} />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[50%] text-center text-xl">
+          {numberOfLikedDishes}
+        </span>
+      </Link>
     </>
   );
 }

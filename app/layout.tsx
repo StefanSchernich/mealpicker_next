@@ -33,7 +33,7 @@ export default function RootLayout({
             </Link>
           </nav>
         </header>
-        <main className="flex flex-col gap-10 p-4">
+        <main className="flex flex-col gap-10 overflow-hidden p-4">
           <Providers>{children}</Providers>
         </main>
       </body>

@@ -208,7 +208,8 @@ export default function Filter({
             //#region Zutatenfilter
           }
           <div
-            className={`overflow-hidden transition-all duration-200 ${ingrFilterVisible ? "max-h-[99999px]" : "-mb-8 max-h-0"}`} // add negative bottom margin to compensate for double gap above/below element with height:0
+            //  add negative bottom margin to compensate for double gap above/below element with height:0; height is necessary to clear space of collapsed filter; scale is necessary to animate height change properly
+            className={`origin-top overflow-hidden transition-all duration-250 ease-linear ${ingrFilterVisible ? "scale-y-1 max-h-[99999px]" : "-mb-8 max-h-0 scale-y-0"}`}
           >
             <h2 className="mb-4 text-center text-xl font-bold">Zutaten</h2>
 

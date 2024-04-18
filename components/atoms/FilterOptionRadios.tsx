@@ -17,7 +17,6 @@ export default function FilterOptionRadios({
 }: FilterOptionsRadio) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-gray-800 p-3 text-center transition-colors hover:bg-slate-700 has-[:checked]:bg-slate-700">
-      {/* // FIXME: Fix centering */}
       <label htmlFor={value}>
         {icon} {value}
       </label>
