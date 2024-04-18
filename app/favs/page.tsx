@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import FavsCard from "@/components/molecules/favsCard";
 import { getLikedDishesFromSessionStorage } from "@/utils/utils";
-import { Dish } from "@/types/types";
+import type { Dish } from "@/types/types";
+import { CircleArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function Favs() {
   const [likedDishes, setLikedDishes] = useState<Dish[]>([]);
@@ -12,22 +15,20 @@ export default function Favs() {
     setLikedDishes(likedDishesInSessionStorage);
   }, []);
   return (
-    //TODO: Add header (back, Title) to favsCard
-    //TODO: Add image & icons to favsCard
-    //STYLE: Style favsCard
     <>
-      <h1>Liked dishes</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">Favs</h1>
+        <Link href="/">
+          <CircleArrowLeft />
+        </Link>
+      </div>
       {likedDishes.length === 0 ? (
-        <p>No liked dishes found.</p>
+        <p>Keine Favs abgespeichert.</p>
       ) : (
-        <ul>
+        <ul className="mt-4 flex flex-col divide-y divide-gray-800">
           {likedDishes.map((dish) => (
             <li key={dish._id}>
-              <h2>{dish.title}</h2>
-              <p>{dish.category}</p>
-              <p>{dish.calories}</p>
-              <p>{dish.difficulty}</p>
-              <p>{dish.imgUrl}</p>
+              <FavsCard dish={dish} />
             </li>
           ))}
         </ul>

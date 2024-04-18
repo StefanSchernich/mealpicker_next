@@ -2,7 +2,11 @@ import { Dish } from "@/types/types";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChefHat, Heart, Pencil, Trash2 } from "lucide-react";
-import { getLikedDishesFromSessionStorage, toggleDish } from "@/utils/utils";
+import {
+  getLikedDishesFromSessionStorage,
+  toggleDish,
+  toggleLike,
+} from "@/utils/utils";
 import Link from "next/link";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { getIcon } from "@/utils/utils";
@@ -67,18 +71,6 @@ export default function DishCard({
     };
   }, [retrievedDish]);
 
-  /**
-   * Function to toggle the like status of a dish in sessionStorage
-   *
-   * @param {string} id - the id of the dish to toggle like status
-   * @return {void}
-   */
-  function toggleLike(dish: Dish) {
-    const likedDishes = getLikedDishesFromSessionStorage("likedDishes");
-    const updatedDishes = toggleDish(likedDishes, dish);
-    sessionStorage.setItem("likedDishes", JSON.stringify(updatedDishes));
-    window.dispatchEvent(new Event("storage")); // manually fire "storage" event, because by default storage event is only fired when *another* tab changes storage
-  }
   // #region return
   return (
     <div

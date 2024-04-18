@@ -62,6 +62,19 @@ export function toggleDish(favDishes: Dish[], dish: Dish) {
 }
 
 /**
+ * Function to toggle the like status of a dish in sessionStorage
+ *
+ * @param {string} id - the id of the dish to toggle like status
+ * @return {void}
+ */
+export function toggleLike(dish: Dish) {
+  const likedDishes = getLikedDishesFromSessionStorage("likedDishes");
+  const updatedDishes = toggleDish(likedDishes, dish);
+  sessionStorage.setItem("likedDishes", JSON.stringify(updatedDishes));
+  window.dispatchEvent(new Event("storage")); // manually fire "storage" event, because by default storage event is only fired when *another* tab changes storage
+}
+
+/**
  * Pick correct symbol for categories
  *
  * @param {string} value - the value to match for symbol

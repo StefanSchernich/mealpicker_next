@@ -4,6 +4,8 @@ type NotificationProps = {
   type: "fail" | "success";
   children: React.ReactNode;
 };
+
+//TODO: Add reset or smth else
 const Notification = forwardRef(function Notification(
   props: NotificationProps,
   ref: ForwardedRef<HTMLDivElement>,
