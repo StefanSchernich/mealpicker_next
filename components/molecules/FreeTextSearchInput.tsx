@@ -39,8 +39,6 @@ export default function FreeTextSearchInput({
   handleTextSearchAdd,
   handleTextSearchRemove,
 }: FreeTextSearchInputProps) {
-  console.log("listLength: ", listLength);
-  console.log("index: ", index);
   return (
     <div className="flex gap-2">
       <div className="max-w-64 grow">

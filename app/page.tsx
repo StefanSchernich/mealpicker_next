@@ -182,10 +182,9 @@ export default function IndexPage() {
         href="/favs"
         className={`fixed bottom-2 right-2 transition-all ${numberOfLikedDishes > 0 ? "opacity-100" : "translate-x-[200%] opacity-0"}`}
       >
-        {/* STYLE: Add animation and change size of heart */}
         <Heart fill="red" color="red" size={48} />
         <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[50%] text-center text-xl">
-          {numberOfLikedDishes}
+          {numberOfLikedDishes > 0 && numberOfLikedDishes}
         </span>
       </Link>
     </>
