@@ -53,7 +53,7 @@ export default function EditDishPage({
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
   }
-  function handleMealImgChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleDishImgChange(e: React.ChangeEvent<HTMLInputElement>) {
     const imgFile = e.target.files ? e.target.files[0] : null;
     // convert File to object URL as input for "src" in the preview Image component; update state
     const imgSrc = imgFile ? URL.createObjectURL(imgFile) : "";
@@ -257,23 +257,25 @@ export default function EditDishPage({
           hover:file:bg-gray-200"
             type="file"
             id="dishImage"
-            onChange={handleMealImgChange}
+            onChange={handleDishImgChange}
             accept="image/*"
           ></input>
         </div>
 
         {previewVisible && (
-          <div className="inline-block">
-            <label className="min-w-12" htmlFor="mealImagePreview">
+          <div className="flex items-center gap-4">
+            <label className="min-w-12" htmlFor="dishImagePreview">
               Preview
             </label>
-            <Image
-              src={imgSrc}
-              width={200}
-              height={200}
-              alt="Preview of dish"
-              id="mealImagePreview"
-            />
+            <div className="relative min-h-32 grow">
+              <Image
+                src={imgSrc}
+                alt="Preview of dish"
+                id="dishImagePreview"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
         )}
         {
