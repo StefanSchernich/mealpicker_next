@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { editDishInDb } from "@/actions/actions";
 import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
@@ -68,9 +68,24 @@ export default function EditDishPage({
   function handleDifficultyChange(e: React.ChangeEvent<HTMLInputElement>) {
     setDifficulty(e.target.value);
   }
-  function handleIngredientAdd() {
-    setIngredients((prevState) => [...prevState, ""]);
+
+  /**
+   * Add a new ingredient to the end of the ingredients array,
+   * or add a new ingredient after the given index if one is provided
+   * @param {number} [index] - the index after which to add the new ingredient
+   */
+  function handleIngredientAdd(index?: number) {
+    if (index === undefined) {
+      setIngredients((prevState) => [...prevState, ""]);
+    } else {
+      setIngredients((prevState) => {
+        const newSearchTerms = [...prevState];
+        newSearchTerms.splice(index + 1, 0, "");
+        return newSearchTerms;
+      });
+    }
   }
+
   function handleIngredientRemove(
     e: React.MouseEvent<SVGSVGElement>,
     index: number,
@@ -112,7 +127,6 @@ export default function EditDishPage({
           maxSizeMB: 0.15,
         });
 
-        // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
         try {
           // 1b: Get signedRequest and URL of uploaded image from AWS
           const {
@@ -214,17 +228,7 @@ export default function EditDishPage({
   return (
     <>
       <h1 className="mt-2 text-2xl font-bold">Gericht editieren</h1>
-      <form
-        className="mt-6 flex flex-col gap-8"
-        onSubmit={handleSubmit}
-        onKeyDown={(e) => {
-          // TODO: Enter soll neue Input-Zeile erzeugen, nicht Formular submitten
-          if (e.key === "Enter") {
-            e.preventDefault();
-            return false;
-          }
-        }}
-      >
+      <form className="mt-6 flex flex-col gap-8" onSubmit={handleSubmit}>
         <div className="flex items-center gap-4">
           <label className="min-w-12" htmlFor="title">
             Titel

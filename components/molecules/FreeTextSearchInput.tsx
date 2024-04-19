@@ -22,7 +22,7 @@ type FreeTextSearchInputProps = {
  */
 function focusNext() {
   const textInputs = Array.from(
-    document.querySelectorAll("input[type='text']"),
+    document.querySelectorAll("input[data-id='ingredient-input']"),
   );
   const currInput = document.activeElement;
   const currInputIndex = textInputs.indexOf(currInput!);
@@ -44,6 +44,7 @@ export default function FreeTextSearchInput({
       <div className="max-w-64 grow">
         <input
           type="text"
+          data-id="ingredient-input"
           className="w-full rounded-md px-2 py-1 text-black"
           placeholder="Freitext Zutat"
           value={value}

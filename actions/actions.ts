@@ -23,8 +23,6 @@ import { FormDataObj } from "@/types/types";
 export async function addDishToDb(
   formData: FormData,
 ): Promise<{ _id: string } | { error: any }> {
-  // console.log("formData IN action / run on server: ", formData); TODO: remove console.log once development is completed
-
   // Convert FormData to Object
   const formDataObj: FormDataObj = Object.fromEntries(formData.entries());
 
