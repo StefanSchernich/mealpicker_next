@@ -6,7 +6,7 @@ import { getLikedDishesFromSessionStorage, toggleLike } from "@/utils/favs";
 import Link from "next/link";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { getIcon } from "@/utils/display";
-import { deleteDishFromDb } from "@/actions/actions";
+import { deleteDishFromDb, deleteImgFromAWS } from "@/actions/actions";
 
 type DishCardProps = {
   retrievedDish: Dish;
@@ -138,11 +138,17 @@ export default function DishCard({
         <Link
           className="inline-block rounded-full bg-gray-600 px-6 py-2 text-black hover:bg-gray-400"
           href={`/deleteDish/${id}`}
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
             if (window.confirm("Möchtest du dieses Rezept wirklich löschen?")) {
-              deleteDishFromDb(id);
-              setRetrievedDish(null); // Hide dish card after deleting
+              try {
+                imgUrl && (await deleteImgFromAWS(imgUrl));
+                await deleteDishFromDb(id);
+                // Hide dish card after deleting
+                setRetrievedDish(null);
+              } catch (error) {
+                console.error(error);
+              }
             }
           }}
         >
@@ -152,3 +158,5 @@ export default function DishCard({
     </div>
   );
 }
+
+// TODO: add feedback for user after deleting dish ("dish deleted" or smth)

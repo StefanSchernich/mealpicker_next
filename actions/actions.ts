@@ -1,5 +1,15 @@
 "use server";
 
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+const client = new S3Client({
+  region: "eu-central-1",
+});
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 type DishDocumentInDb = {
   title: string;
   imgUrl?: string;
@@ -13,6 +23,7 @@ type DishDocumentInDb = {
 
 import { connectToDb, Recipe } from "@/db/db";
 import { FormDataObj } from "@/types/types";
+import axios from "axios";
 
 /**
  * Add a new dish to the database based on the provided form data.
@@ -93,3 +104,30 @@ export async function deleteDishFromDb(id: string) {
     console.error(error);
   }
 }
+
+export async function deleteImgFromAWS(imgUrl?: string) {
+  if (!imgUrl) return;
+
+  // For some reason, there are two different domains under which images are stored in AWS --> check both
+  const matchResult =
+    imgUrl.match(/https:\/\/mymealpicker.s3.amazonaws.com\/(.+)$/) ??
+    imgUrl.match(/https:\/\/mymealpicker.s3.eu-central-1.amazonaws.com\/(.+)$/);
+  const fileName = matchResult?.[1];
+  if (!fileName) return;
+
+  const client = new S3Client({
+    region: "eu-central-1",
+  });
+  const deleteCmd = new DeleteObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: fileName,
+  });
+
+  const signedRequest = await getSignedUrl(client, deleteCmd, {
+    expiresIn: 3600,
+  });
+
+  await axios.delete(signedRequest);
+}
+
+// TODO: add replace action (should only delete old img if name is different. If name is the same, aws will automatically replace the image w/o changing the name)
