@@ -66,6 +66,35 @@ export default function FreeTextSearchInput({
   handleTextSearchRemove,
   isInFilter,
 }: FreeTextSearchInputProps) {
+  /**
+   * Adds a new text input based on the current state.
+   *
+   * @return {Promise<void>} A promise that resolves when the new text input is added.
+   */
+  async function addNewTextInputWithEnter() {
+    if (isInFilter) {
+      // this branch is used when coming from filter
+      // Check if there is an empty input
+      const emptyInputIdx = findEmptyInputIdx(); // is -1 if there is no empty input elem
+      if (emptyInputIdx === -1) {
+        //  if no: add new input at end and focus it
+        await handleTextSearchAdd();
+        focusLast();
+      } else {
+        //  if yes: focus it
+        const textInputs: HTMLInputElement[] = Array.from(
+          document.querySelectorAll("input[data-id='ingredient-input']"),
+        );
+        const nextEmptyElem = textInputs[emptyInputIdx];
+        nextEmptyElem.focus();
+      }
+    } else {
+      // this branch is used when coming from add/edit -> want to insert new input after currently active input
+      await handleTextSearchAdd();
+      focusNext();
+    }
+  }
+
   return (
     <div className="flex gap-2">
       <div className="max-w-64 grow">
@@ -76,33 +105,10 @@ export default function FreeTextSearchInput({
           placeholder="Freitext Zutat"
           value={value}
           onChange={(e) => handleTextSearchChange(e, index)}
-          onKeyDown={async (e) => {
+          onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-
-              if (isInFilter) {
-                // this branch is used when coming from filter
-                // Check if there is an empty input
-                const emptyInputIdx = findEmptyInputIdx(); // is -1 if there is no empty input elem
-                if (emptyInputIdx === -1) {
-                  //  if no: add new input at end and focus it
-                  await handleTextSearchAdd();
-                  focusLast();
-                } else {
-                  //  if yes: focus it
-                  const textInputs: HTMLInputElement[] = Array.from(
-                    document.querySelectorAll(
-                      "input[data-id='ingredient-input']",
-                    ),
-                  );
-                  const nextEmptyElem = textInputs[emptyInputIdx];
-                  nextEmptyElem.focus();
-                }
-              } else {
-                // this branch is used when coming from add/edit -> want to insert new input after currently active input
-                await handleTextSearchAdd();
-                focusNext();
-              }
+              addNewTextInputWithEnter();
             }
           }}
         />
@@ -115,7 +121,12 @@ export default function FreeTextSearchInput({
         )}
         {/* Show 'add' button only at last item */}
         {listLength - 1 === index && (
-          <CirclePlus onClick={() => handleTextSearchAdd()} />
+          <CirclePlus
+            onClick={async () => {
+              await handleTextSearchAdd(); // await is necessary to make sure that new input is added *before* focus is set
+              focusLast();
+            }}
+          />
         )}
       </div>
     </div>
