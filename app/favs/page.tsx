@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import FavsCard from "@/components/molecules/favsCard";
-import { getLikedDishesFromSessionStorage } from "@/utils/utils";
+import { getLikedDishesFromSessionStorage } from "@/utils/favs";
 import type { Dish } from "@/types/types";
 import { CircleArrowLeft } from "lucide-react";
 import Link from "next/link";

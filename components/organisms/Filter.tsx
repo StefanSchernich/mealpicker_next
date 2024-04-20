@@ -1,4 +1,4 @@
-import React, { FormEvent, useTransition } from "react";
+import React, { FormEvent, SetStateAction, useTransition } from "react";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import FilterOptionCheckbox from "@/components/atoms/FilterOptionCheckbox";
 import {
@@ -8,7 +8,7 @@ import {
   ingredientOptions,
 } from "@/data/data";
 import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
-import { trimFreetextSearchTerms } from "@/utils/utils";
+import { trimFreetextSearchTerms } from "@/utils/dishProperties";
 import axios from "axios";
 import SubmitBtn from "../atoms/SubmitBtn";
 import type { Dish } from "@/types/types";
@@ -29,7 +29,7 @@ type FilterProps = {
   }: {
     target: { value: string };
   }) => void;
-  handleTextSearchAdd: (index?: number) => void;
+  handleTextSearchAdd: () => void;
   handleTextSearchChange: (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
@@ -214,6 +214,7 @@ export default function Filter({
                     index={index}
                     value={searchTerm}
                     listLength={ingSearchTerms.length}
+                    isInFilter
                     handleTextSearchChange={handleTextSearchChange}
                     handleTextSearchAdd={handleTextSearchAdd}
                     handleTextSearchRemove={handleTextSearchRemove}

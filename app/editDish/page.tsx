@@ -4,7 +4,10 @@ import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import Notification from "@/components/atoms/Notification";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
-import { trimFreetextSearchTerms } from "@/utils/utils";
+import {
+  trimFreetextSearchTerms,
+  handleIngredientAdd,
+} from "@/utils/dishProperties";
 import axios from "axios";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
@@ -67,23 +70,6 @@ export default function EditDishPage({
   }
   function handleDifficultyChange(e: React.ChangeEvent<HTMLInputElement>) {
     setDifficulty(e.target.value);
-  }
-
-  /**
-   * Add a new ingredient to the end of the ingredients array,
-   * or add a new ingredient after the given index if one is provided
-   * @param {number} [index] - the index after which to add the new ingredient
-   */
-  function handleIngredientAdd(index?: number) {
-    if (index === undefined) {
-      setIngredients((prevState) => [...prevState, ""]);
-    } else {
-      setIngredients((prevState) => {
-        const newSearchTerms = [...prevState];
-        newSearchTerms.splice(index + 1, 0, "");
-        return newSearchTerms;
-      });
-    }
   }
 
   function handleIngredientRemove(
@@ -319,7 +305,9 @@ export default function EditDishPage({
               key={index}
               index={index}
               listLength={ingredients.length}
-              handleTextSearchAdd={handleIngredientAdd}
+              handleTextSearchAdd={() =>
+                handleIngredientAdd(setIngredients, index)
+              }
               handleTextSearchRemove={handleIngredientRemove}
               handleTextSearchChange={handleIngredientChange}
               value={ingredient}

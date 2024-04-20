@@ -8,11 +8,12 @@ type FreeTextSearchInputProps = {
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
   ) => void;
-  handleTextSearchAdd: (index?: number) => void;
+  handleTextSearchAdd: () => void;
   handleTextSearchRemove: (
     e: React.MouseEvent<SVGSVGElement>,
     index: number,
   ) => void;
+  isInFilter?: boolean; // for applying different logic to added ingredient search terms: add/edit -> insert after current/active input; filter -> always insert at end
 };
 
 /**
@@ -31,6 +32,31 @@ function focusNext() {
   input.focus();
 }
 
+/**
+ * Focuses on the last input element with the data-id attribute set to 'ingredient-input'.
+ *
+ * @return {void} This function does not return anything.
+ */
+function focusLast() {
+  const textInputs = Array.from(
+    document.querySelectorAll("input[data-id='ingredient-input']"),
+  );
+  const lastInput = textInputs.at(-1) as HTMLInputElement;
+  lastInput.focus();
+}
+
+/**
+ * Finds the index of the first empty input element within the list of HTMLInputElement textInputs with data-id attribute set to 'ingredient-input'.
+ *
+ * @return {number} The index of the first empty input element, or -1 if none are found.
+ */
+function findEmptyInputIdx() {
+  const textInputs: HTMLInputElement[] = Array.from(
+    document.querySelectorAll("input[data-id='ingredient-input']"),
+  );
+  return textInputs.findIndex((input) => input.value === "");
+}
+
 export default function FreeTextSearchInput({
   value,
   index,
@@ -38,6 +64,7 @@ export default function FreeTextSearchInput({
   handleTextSearchChange,
   handleTextSearchAdd,
   handleTextSearchRemove,
+  isInFilter,
 }: FreeTextSearchInputProps) {
   return (
     <div className="flex gap-2">
@@ -52,8 +79,30 @@ export default function FreeTextSearchInput({
           onKeyDown={async (e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              await handleTextSearchAdd(index);
-              focusNext();
+
+              if (isInFilter) {
+                // this branch is used when coming from filter
+                // Check if there is an empty input
+                const emptyInputIdx = findEmptyInputIdx(); // is -1 if there is no empty input elem
+                if (emptyInputIdx === -1) {
+                  //  if no: add new input at end and focus it
+                  await handleTextSearchAdd();
+                  focusLast();
+                } else {
+                  //  if yes: focus it
+                  const textInputs: HTMLInputElement[] = Array.from(
+                    document.querySelectorAll(
+                      "input[data-id='ingredient-input']",
+                    ),
+                  );
+                  const nextEmptyElem = textInputs[emptyInputIdx];
+                  nextEmptyElem.focus();
+                }
+              } else {
+                // this branch is used when coming from add/edit -> want to insert new input after currently active input
+                await handleTextSearchAdd();
+                focusNext();
+              }
             }
           }}
         />
@@ -66,7 +115,7 @@ export default function FreeTextSearchInput({
         )}
         {/* Show 'add' button only at last item */}
         {listLength - 1 === index && (
-          <CirclePlus onClick={(e) => handleTextSearchAdd()} />
+          <CirclePlus onClick={() => handleTextSearchAdd()} />
         )}
       </div>
     </div>

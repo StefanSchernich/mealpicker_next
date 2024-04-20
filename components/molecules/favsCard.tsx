@@ -1,20 +1,14 @@
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { Dish } from "@/types/types";
-import {
-  getIcon,
-  getLikedDishesFromSessionStorage,
-  toggleLike,
-} from "@/utils/utils";
+import { getLikedDishesFromSessionStorage, toggleLike } from "@/utils/favs";
+import { getIcon } from "@/utils/display";
 import { Heart } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
   Modal,
   ModalContent,
-  ModalHeader,
   ModalBody,
-  ModalFooter,
-  Button,
   useDisclosure,
 } from "@nextui-org/react";
 import DishCard from "../organisms/DishCard";

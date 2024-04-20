@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     "Mealpicker nimmt dir das Überlegen ab, was du heute kochen sollst.",
 };
-
+// STYLE: implement responsive design for tablet + desktop
 export default function RootLayout({
   children,
 }: Readonly<{

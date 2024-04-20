@@ -1,7 +1,7 @@
 import { Recipe, connectToDb } from "@/db/db";
 
 import type { FilterObj } from "@/types/types";
-import { generateFilter } from "@/utils/utils";
+import { generateFilter } from "@/utils/dishProperties";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

@@ -1,11 +1,13 @@
 "use client";
-import Notification from "@/components/atoms/Notification";
 import Filter from "@/components/organisms/Filter";
 import DishCard from "@/components/organisms/DishCard";
-import { useEffect, useRef, useState } from "react";
-import { getLikedDishesFromSessionStorage } from "@/utils/utils";
+import Notification from "@/components/atoms/Notification";
+import { getLikedDishesFromSessionStorage } from "@/utils/favs";
+import { handleIngredientAdd } from "@/utils/dishProperties";
 import { Heart } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+
 import type { Dish } from "@/types/types";
 
 export default function IndexPage() {
@@ -14,8 +16,8 @@ export default function IndexPage() {
   const [calories, setCalories] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [ingrFilterVisible, setIngrFilterVisible] = useState(false);
-  const [ingSearchTerms, setIngSearchTerms] = useState([""]);
-  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [ingSearchTerms, setIngSearchTerms] = useState([""]); // the ingredients in text inputs
+  const [ingredients, setIngredients] = useState<string[]>([]); // the ingredients in checkboxes
   const [retrievedDish, setRetrievedDish] = useState<Dish | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [noDishWithGivenFilter, setNoDishWithGivenFilter] = useState(false);
@@ -61,27 +63,6 @@ export default function IndexPage() {
       newSearchTerms[index] = value;
       return newSearchTerms;
     });
-  }
-
-  /**
-   * Handles the addition of a new search term to the ingredient search terms array.
-   *
-   * This function adds a new empty string to the `ingSearchTerms` array at the specified index. If no index is provided,
-   * the new search term is appended to the end of the array.
-   *
-   * @param {number | undefined} [index] - The index at which to insert the new search term.
-   * @return {void} This function does not return a value.
-   */
-  function handleTextSearchAdd(index?: number) {
-    if (index === undefined) {
-      setIngSearchTerms((prevState) => [...prevState, ""]);
-    } else {
-      setIngSearchTerms((prevState) => {
-        const newSearchTerms = [...prevState];
-        newSearchTerms.splice(index + 1, 0, "");
-        return newSearchTerms;
-      });
-    }
   }
 
   function handleTextSearchRemove(
@@ -154,7 +135,7 @@ export default function IndexPage() {
         handleDifficultyChange={handleDifficultyChange}
         handleIngredientChange={handleIngredientChange}
         handleTextSearchChange={handleTextSearchChange}
-        handleTextSearchAdd={handleTextSearchAdd}
+        handleTextSearchAdd={() => handleIngredientAdd(setIngSearchTerms)}
         handleTextSearchRemove={handleTextSearchRemove}
         handleIngFilterVisibility={handleIngFilterVisibility}
         handleFilterFormReset={handleFilterFormReset}

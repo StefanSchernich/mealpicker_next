@@ -2,14 +2,10 @@ import { Dish } from "@/types/types";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChefHat, Heart, Pencil, Trash2 } from "lucide-react";
-import {
-  getLikedDishesFromSessionStorage,
-  toggleDish,
-  toggleLike,
-} from "@/utils/utils";
+import { getLikedDishesFromSessionStorage, toggleLike } from "@/utils/favs";
 import Link from "next/link";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
-import { getIcon } from "@/utils/utils";
+import { getIcon } from "@/utils/display";
 import { deleteDishFromDb } from "@/actions/actions";
 
 type DishCardProps = {

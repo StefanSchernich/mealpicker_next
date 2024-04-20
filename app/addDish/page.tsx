@@ -6,7 +6,10 @@ import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
 import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import axios from "axios";
 import Image from "next/image";
-import { trimFreetextSearchTerms } from "@/utils/utils";
+import {
+  trimFreetextSearchTerms,
+  handleIngredientAdd,
+} from "@/utils/dishProperties";
 import { addDishToDb } from "@/actions/actions";
 import imageCompression from "browser-image-compression";
 import SubmitBtn from "@/components/atoms/SubmitBtn";
@@ -42,22 +45,7 @@ export default function AddDish() {
   function handleDifficultyChange(e: React.ChangeEvent<HTMLInputElement>) {
     setDifficulty(e.target.value);
   }
-  /**
-   * Add a new ingredient to the end of the ingredients array,
-   * or add a new ingredient after the given index if one is provided
-   * @param {number} [index] - the index after which to add the new ingredient
-   */
-  function handleIngredientAdd(index?: number) {
-    if (index === undefined) {
-      setIngredients((prevState) => [...prevState, ""]);
-    } else {
-      setIngredients((prevState) => {
-        const newSearchTerms = [...prevState];
-        newSearchTerms.splice(index + 1, 0, "");
-        return newSearchTerms;
-      });
-    }
-  }
+
   function handleIngredientRemove(
     e: React.MouseEvent<SVGSVGElement>,
     index: number,
@@ -302,7 +290,9 @@ export default function AddDish() {
               key={index}
               index={index}
               listLength={ingredients.length}
-              handleTextSearchAdd={handleIngredientAdd}
+              handleTextSearchAdd={() =>
+                handleIngredientAdd(setIngredients, index)
+              }
               handleTextSearchRemove={handleIngredientRemove}
               handleTextSearchChange={handleIngredientChange}
               value={ingredient}
