@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className="scroll-smooth">
-      <body className={`${inter.className} min-h-screen bg-black`}>
+      <body className={`${inter.className} min-h-screen bg-black text-white`}>
         <header className="bg-sky-400 p-4 text-black">
           <nav className="flex justify-between">
             <Link href="/" className="text-2xl font-bold">
