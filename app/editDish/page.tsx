@@ -60,6 +60,7 @@ export default function EditDishPage({
   const [editOutcome, setEditOutcome] = useState("");
 
   const notificationRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isPending, startTransition] = useTransition();
 
@@ -112,8 +113,9 @@ export default function EditDishPage({
       // 1: If image was uploaded in input, upload it to AWS S3 and get the URL of the uploaded image in AWS
       let imgUrl = "";
 
-      // 1a: re-convert imgSrc (= the objectURL) to (image) File and compress ist
-      if (imgSrc) {
+      // 1a: if a new img was uploaded, re-convert imgSrc (= the objectURL of the new img) to (image) File and compress it
+      if (fileInputRef.current?.files?.length) {
+        // is 1 (= true) if a new img was uploaded, 0 (= false) if not;
         const imgFromObjectURL = (
           await axios.get(imgSrc, { responseType: "blob" })
         ).data as File;
@@ -224,6 +226,7 @@ export default function EditDishPage({
           hover:file:bg-gray-200"
             type="file"
             id="dishImage"
+            ref={fileInputRef}
             onChange={handleDishImgChange}
             accept="image/*"
           ></input>
