@@ -1,18 +1,19 @@
 "use client";
-import { useState, useEffect, useRef, useTransition } from "react";
-import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
-import Notification from "@/components/atoms/Notification";
-import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
-import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import axios from "axios";
 import Image from "next/image";
+import imageCompression from "browser-image-compression";
+import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
+import FreeTextSearchInput from "@/components/molecules/FreeTextSearchInput";
+import RadioFilterSection from "@/components/molecules/RadioFilterSection";
+import Notification from "@/components/atoms/Notification";
 import {
   trimFreetextSearchTerms,
   handleIngredientAdd,
 } from "@/utils/dishProperties";
+import { getSignedRequest, uploadFile } from "@/utils/aws";
 import { addDishToDb } from "@/actions/actions";
-import imageCompression from "browser-image-compression";
 import SubmitBtn from "@/components/atoms/SubmitBtn";
+import { useState, useEffect, useRef, useTransition } from "react";
 
 export default function AddDish() {
   // #region States, Refs and Effects
@@ -152,35 +153,6 @@ export default function AddDish() {
     setIngredients([""]);
     setPreviewVisible(false);
     setImgSrc("");
-  }
-
-  // Helper Function for Submitting / File Upload to AWS S3
-  /**
-   * Retrieves a signed request from the server for uploading a file to AWS S3.
-   *
-   * @param {globalThis.File | null} file - The file to be uploaded
-   * @return {AxiosResponse} The response containing a "data" object, which contains the signedRequest (= URL with embedded credentials) for the file upload and the URL of the uploaded file in AWS S3
-   */
-  async function getSignedRequest(file: globalThis.File | null) {
-    if (!file) throw new Error("Keine Datei ausgewählt");
-    const response = await axios.get(
-      `api/sign-s3?file-name=${file.name}&file-type=${file.type}`,
-    );
-    return response;
-  }
-
-  /**
-   * Uploads the image file to the URL signed by AWS.
-   *
-   * @param {globalThis.File} file - image file to be uploaded
-   * @param {string} signedRequest - the signed URL for the file upload
-   * @param {string} url - the URL of the uploaded file
-   */
-  async function uploadFile(
-    file: globalThis.File,
-    signedRequest: string,
-  ): Promise<void> {
-    await axios.put(signedRequest, file); // signedRequest is an AWS S3 URL with embedded credentials
   }
 
   // Einblenden von Preview nur, wenn ein Bild vorhanden ist
