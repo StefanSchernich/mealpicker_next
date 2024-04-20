@@ -44,7 +44,16 @@ export default function EditDishPage({
   const [calories, setCalories] = useState(qryCalories);
   const [difficulty, setDifficulty] = useState(qryDifficulty);
   const [ingredients, setIngredients] = useState<string[]>(
-    qryIngredients && Array.isArray(qryIngredients) ? qryIngredients : [""], // if there is only one ingredient in the query string, qryIngrediensts is a string, so convert it to an array so ingredients.map(...) works
+    // if there is only one ingredient in the query string, qryIngrediensts is a string, so convert it to an array so ingredients.map(...) works
+    () => {
+      if (qryIngredients) {
+        return Array.isArray(qryIngredients)
+          ? qryIngredients
+          : [qryIngredients];
+      } else {
+        return [""];
+      }
+    },
   );
   const [previewVisible, setPreviewVisible] = useState(false);
   const [imgSrc, setImgSrc] = useState(qryImgUrl ? qryImgUrl : "");
@@ -175,7 +184,7 @@ export default function EditDishPage({
     }
   }, [imgSrc]);
 
-  // scroll to Notification component after adding
+  // scroll to Notification component after editing
   useEffect(() => {
     if (editOutcome) {
       notificationRef.current?.scrollIntoView({ behavior: "smooth" });
