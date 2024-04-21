@@ -68,6 +68,40 @@ export default function Filter({
 }: FilterProps) {
   const [isPending, startTransition] = useTransition();
 
+  async function fetchRndDishAndSetStates(
+    formData: FormData,
+    currentId: string | undefined,
+  ) {
+    try {
+      // Make the API call to get a new dish
+      const res = await axios.postForm("/api/fetchRandomRecipe", formData);
+
+      // if no dish is found with given filter, change state and show message to user
+      if (res.data.message === "No dish found with given filter") {
+        setRetrievedDish(null);
+        setNoDishWithGivenFilter(true);
+        return;
+      }
+
+      // if a dish is found, hide the "NoDishFound" Notification
+      setNoDishWithGivenFilter(false);
+
+      const newDish = res.data;
+      const newDishId = newDish._id;
+
+      // if the new dish is the same as the old one, try to fetch another one with the same filter by calling the function recursively
+      if (newDishId === currentId) {
+        return fetchRndDishAndSetStates(formData, currentId);
+      }
+
+      // else reset ImageLoad state (so that placeholder is shown again until new dish image is fetched) and set the new dish in state
+      setIsImageLoaded(false);
+      setRetrievedDish(newDish);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   // #region Submit Handler
   const handleSubmit = (e: FormEvent) => {
     // TODO: Check, if this can be replaced with server action alone (i.e. w/o any API call)
@@ -103,34 +137,9 @@ export default function Filter({
       currentId = retrievedDish._id;
     }
 
-    startTransition(async () => {
-      try {
-        // Make the API call to get a new dish
-        const res = await axios.postForm("/api/fetchRandomRecipe", formData);
-
-        // if no dish is found with given filter, change state and show message to user
-        if (res.data.message === "No dish found with given filter") {
-          setRetrievedDish(null);
-          setNoDishWithGivenFilter(true);
-          return;
-        }
-
-        // if a dish is found, hide the "NoDishFound" Notification
-        setNoDishWithGivenFilter(false);
-
-        const newDish = res.data;
-        const newDishId = newDish._id;
-
-        // if the new dish is the same as the old one, no changes are necessary --> return
-        if (newDishId === currentId) return;
-
-        // else reset ImageLoad state (so that placeholder is shown again until new dish image is fetched) and set the new dish in state
-        setIsImageLoaded(false);
-        setRetrievedDish(newDish);
-      } catch (error) {
-        console.error(error);
-      }
-    });
+    startTransition(
+      async () => await fetchRndDishAndSetStates(formData, currentId),
+    );
   };
 
   return (

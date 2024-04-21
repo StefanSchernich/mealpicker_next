@@ -12,7 +12,6 @@
     "@aws-sdk/client-s3": "^3.556.0",
     "@aws-sdk/s3-request-presigner": "^3.556.0",
     "@nextui-org/react": "^2.3.1",
-    "aws-sdk": "^2.1600.0",
     "axios": "^1.6.8",
     "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.0",
