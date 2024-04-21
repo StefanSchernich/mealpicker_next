@@ -10,9 +10,7 @@ import axios from "axios";
  */
 export async function getSignedRequest(file: globalThis.File | null) {
   if (!file) throw new Error("Keine Datei ausgewählt");
-  const response = await axios.get(
-    `api/sign-s3?file-name=${file.name}`,
-  );
+  const response = await axios.get(`api/sign-s3?file-name=${file.name}`);
   return response;
 }
 
@@ -29,5 +27,3 @@ export async function uploadFile(
 ): Promise<void> {
   await axios.put(signedRequest, file); // signedRequest is an AWS S3 URL with embedded credentials
 }
-
-// TODO: Add deleteFile

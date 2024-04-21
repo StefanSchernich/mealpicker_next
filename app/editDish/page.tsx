@@ -7,13 +7,14 @@ import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import SubmitBtn from "@/components/atoms/SubmitBtn";
 import Notification from "@/components/atoms/Notification";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
-import { editDishInDb } from "@/actions/actions";
+import { deleteImgFromAWS, editDishInDb } from "@/actions/actions";
 import {
   trimFreetextSearchTerms,
   handleIngredientAdd,
 } from "@/utils/dishProperties";
 import { getSignedRequest, uploadFile } from "@/utils/aws";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 export default function EditDishPage({
   searchParams,
@@ -64,6 +65,8 @@ export default function EditDishPage({
 
   const [isPending, startTransition] = useTransition();
 
+  const router = useRouter();
+
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
   }
@@ -109,8 +112,11 @@ export default function EditDishPage({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // default: refresh of entire page
 
+    // Clear the editOutcome Notification component before submitting the form (there might be one still showing from a previous edit)
+    setEditOutcome("");
+
     startTransition(async () => {
-      // 1: If image was uploaded in input, upload it to AWS S3 and get the URL of the uploaded image in AWS
+      // 1: If a new image was uploaded in input, upload it to AWS S3 and get the URL of the uploaded image in AWS
       let imgUrl = "";
 
       // 1a: if a new img was uploaded, re-convert imgSrc (= the objectURL of the new img) to (image) File and compress it
@@ -166,7 +172,6 @@ export default function EditDishPage({
       try {
         const result = await editDishInDb(formData); // result is id of editedDish if edit was successful, or error message if not
         if ("_id" in result) {
-          const { _id: id } = result;
           setEditOutcome("success");
         }
         if ("error" in result) {
@@ -176,6 +181,21 @@ export default function EditDishPage({
         // this fires if the server action itself (not the interaction with the db) throws an error
         console.error("Server action failed:", error.message);
       }
+
+      // 4: If the dish already had a picture before, delete the old pic from AWS S3
+      // qryImgUrl is the AWS S3 URL of the old image, if dish already had a pic before editing, otherwise ""
+      if (qryImgUrl) {
+        try {
+          await deleteImgFromAWS(qryImgUrl);
+        } catch (error: any) {
+          console.error("Deleting from AWS S3 failed:", error.message);
+        }
+      }
+      // 5. Finally, reload the page. This is important, because after first edit the data in state and from query params are outdated (the query params will still point to the old imgURL). A second edit would not work, e.g. deleting file from AWS bc the address is wrong/outdated)
+      router.push(
+        `/editDish?id=${id}&title=${title}&imgUrl=${imgUrl}&category=${category}&calories=${calories}&difficulty=${difficulty}`,
+        { scroll: false },
+      );
     });
   }
   // #region Effects
@@ -243,7 +263,7 @@ export default function EditDishPage({
                 alt="Preview of dish"
                 id="dishImagePreview"
                 fill
-                className="object-cover"
+                className="object-contain"
               />
             </div>
           </div>

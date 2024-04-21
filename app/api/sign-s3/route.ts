@@ -1,15 +1,10 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 const client = new S3Client({
   region: "eu-central-1",
 });
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse, type NextRequest } from "next/server";
 
-// TODO: Switch to AWS SDK v3
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const fileName = searchParams.get("file-name");

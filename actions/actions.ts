@@ -102,6 +102,12 @@ export async function deleteDishFromDb(id: string) {
   }
 }
 
+/**
+ * Deletes an image from AWS S3 given its URL.
+ *
+ * @param {string} imgUrl - The URL of the image to delete.
+ * @return {Promise<void>} A Promise that resolves when the image is successfully deleted.
+ */
 export async function deleteImgFromAWS(imgUrl?: string) {
   if (!imgUrl) return;
 
