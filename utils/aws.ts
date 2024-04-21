@@ -12,7 +12,10 @@ export async function getSignedRequest(file: globalThis.File | null) {
   if (!file) throw new Error("Keine Datei ausgewählt");
   // if no fileName is provided, generate a random file name
   const fileName = file.name || uuidv4();
-  const response = await axios.get(`api/sign-s3?file-name=${fileName}`);
+  const fileType = file.type;
+  const response = await axios.get(
+    `api/sign-s3?file-name=${fileName}&file-type=${fileType}`,
+  );
   return response;
 }
 

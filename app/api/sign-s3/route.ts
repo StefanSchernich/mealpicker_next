@@ -8,10 +8,13 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const fileName = searchParams.get("file-name");
+  const fileType = searchParams.get("file-type");
   const putCmd = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileName!,
+    Key: `${fileName}.${fileType}`,
+    Body: `${fileName}.${fileType}`,
     ACL: "public-read",
+    ContentType: fileType?.toString(),
   });
 
   try {
