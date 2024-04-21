@@ -11,10 +11,9 @@ export async function GET(req: NextRequest) {
   const fileType = searchParams.get("file-type");
   const putCmd = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: `${fileName}.${fileType}`,
-    Body: `${fileName}.${fileType}`,
+    Key: fileName!,
     ACL: "public-read",
-    ContentType: fileType?.toString(),
+    ContentType: fileType!,
   });
 
   try {
