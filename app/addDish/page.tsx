@@ -102,7 +102,7 @@ export default function AddDish() {
             await getSignedRequest(compressedImg);
           imgUrl = uploadedImgUrlInAWS;
           // 1c: Upload the image file to the signedRequest URL provided by AWS
-          await uploadFile(compressedImg, signedRequest);
+          // await uploadFile(compressedImg, signedRequest);
         } catch (error: any) {
           console.error(
             "There has been an error trying to upload the image:",

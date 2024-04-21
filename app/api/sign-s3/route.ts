@@ -2,17 +2,15 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 const client = new S3Client({
   region: "eu-central-1",
 });
-import { v4 as uuidv4 } from "uuid";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
-  // if no fileName is provided, generate a random file name
-  const fileName = searchParams.get("file-name") || uuidv4();
+  const fileName = searchParams.get("file-name");
   const putCmd = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileName,
+    Key: fileName!,
     ACL: "public-read",
   });
 
@@ -24,6 +22,7 @@ export async function GET(req: NextRequest) {
       signedRequest,
       uploadedImgUrlInAWS: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`,
     };
+
     return NextResponse.json(returnData);
   } catch (error) {
     console.error(error);

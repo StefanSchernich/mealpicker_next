@@ -1,5 +1,6 @@
 // Thise file contains helpers to deal with AWS S3 for uploading / deleting files
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Retrieves a signed request from the server for uploading a file to AWS S3.
@@ -9,7 +10,9 @@ import axios from "axios";
  */
 export async function getSignedRequest(file: globalThis.File | null) {
   if (!file) throw new Error("Keine Datei ausgewählt");
-  const response = await axios.get(`api/sign-s3?file-name=${file.name}`);
+  // if no fileName is provided, generate a random file name
+  const fileName = file.name || uuidv4();
+  const response = await axios.get(`api/sign-s3?file-name=${fileName}`);
   return response;
 }
 
