@@ -27,6 +27,7 @@ export default function AddDish() {
   const [uploadOutcome, setUploadOutcome] = useState("");
 
   const notificationRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -74,6 +75,10 @@ export default function AddDish() {
   // #region Submit Handler
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // default: refresh of entire page
+
+    // Clear the uploadOutcome Notification component before submitting the form (there might be one still showing from a previous adding)
+    setUploadOutcome("");
+
     startTransition(async () => {
       // 1: If image was uploaded in input, upload it to AWS S3 and get the URL of the uploaded image in AWS
       let imgUrl = "";
@@ -103,6 +108,9 @@ export default function AddDish() {
             "There has been an error trying to upload the image:",
             error.message,
           );
+        } finally {
+          // revokeObjectURL to avoid memory leaks
+          URL.revokeObjectURL(imgSrc);
         }
       }
 
@@ -129,7 +137,6 @@ export default function AddDish() {
       try {
         const result = await addDishToDb(formData); // result is id of newDish if successfully added to db, or error message if not
         if ("_id" in result) {
-          const { _id: id } = result;
           setUploadOutcome("success");
           resetDishStates();
         }
@@ -202,6 +209,7 @@ export default function AddDish() {
             file:font-semibold file:text-black
             hover:file:bg-gray-200"
             id="dishImage"
+            ref={fileInputRef}
             onChange={handleMealImgChange}
             accept="image/*"
           ></input>

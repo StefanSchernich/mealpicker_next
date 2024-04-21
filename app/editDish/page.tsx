@@ -145,57 +145,60 @@ export default function EditDishPage({
             "There has been an error trying to upload the image:",
             error.message,
           );
+        } finally {
+          // revokeObjectURL to avoid memory leaks
+          URL.revokeObjectURL(imgSrc);
         }
-      }
 
-      // 2: The image is uploaded to AWS now and the URL of the uploaded image is in "url" --> prepare the data to be sent to the server
-      const formData = new FormData();
-      const sanitizedIngredients = trimFreetextSearchTerms(ingredients);
+        // 2: The image is uploaded to AWS now and the URL of the uploaded image is in "url" --> prepare the data to be sent to the server
+        const formData = new FormData();
+        const sanitizedIngredients = trimFreetextSearchTerms(ingredients);
 
-      // 2a: only append non-falsy values and non-empty array; none of the following should be null, however, since they are all required inputs
-      formData.append("id", id);
-      title && formData.append("title", title);
-      imgUrl && formData.append("imgUrl", imgUrl);
-      category && formData.append("category", category);
-      calories && formData.append("calories", calories);
-      difficulty && formData.append("difficulty", difficulty);
+        // 2a: only append non-falsy values and non-empty array; none of the following should be null, however, since they are all required inputs
+        formData.append("id", id);
+        title && formData.append("title", title);
+        imgUrl && formData.append("imgUrl", imgUrl);
+        category && formData.append("category", category);
+        calories && formData.append("calories", calories);
+        difficulty && formData.append("difficulty", difficulty);
 
-      // FormData does NOT allow arrays as values
-      // --> add each string separately under same key (which is allowed; array can be recovered by formData.getAll method) if there are any ingredients
-      if (sanitizedIngredients.length > 0) {
-        sanitizedIngredients.forEach((ingredient) => {
-          formData.append("ingredients", ingredient);
-        });
-      }
-
-      // 3: Invoke the server action with the finalized form data. The action updates the dish in the db
-      try {
-        const result = await editDishInDb(formData); // result is id of editedDish if edit was successful, or error message if not
-        if ("_id" in result) {
-          setEditOutcome("success");
+        // FormData does NOT allow arrays as values
+        // --> add each string separately under same key (which is allowed; array can be recovered by formData.getAll method) if there are any ingredients
+        if (sanitizedIngredients.length > 0) {
+          sanitizedIngredients.forEach((ingredient) => {
+            formData.append("ingredients", ingredient);
+          });
         }
-        if ("error" in result) {
-          setEditOutcome("fail");
-        }
-      } catch (error: any) {
-        // this fires if the server action itself (not the interaction with the db) throws an error
-        console.error("Server action failed:", error.message);
-      }
 
-      // 4: If the dish already had a picture before, delete the old pic from AWS S3
-      // qryImgUrl is the AWS S3 URL of the old image, if dish already had a pic before editing, otherwise ""
-      if (qryImgUrl) {
+        // 3: Invoke the server action with the finalized form data. The action updates the dish in the db
         try {
-          await deleteImgFromAWS(qryImgUrl);
+          const result = await editDishInDb(formData); // result is id of editedDish if edit was successful, or error message if not
+          if ("_id" in result) {
+            setEditOutcome("success");
+          }
+          if ("error" in result) {
+            setEditOutcome("fail");
+          }
         } catch (error: any) {
-          console.error("Deleting from AWS S3 failed:", error.message);
+          // this fires if the server action itself (not the interaction with the db) throws an error
+          console.error("Server action failed:", error.message);
         }
+
+        // 4: If the dish already had a picture before, delete the old pic from AWS S3
+        // qryImgUrl is the AWS S3 URL of the old image, if dish already had a pic before editing, otherwise ""
+        if (qryImgUrl) {
+          try {
+            await deleteImgFromAWS(qryImgUrl);
+          } catch (error: any) {
+            console.error("Deleting from AWS S3 failed:", error.message);
+          }
+        }
+        // 5. Finally, reload the page. This is important, because after first edit the data in state and from query params are outdated (the query params will still point to the old imgURL). A second edit would not work, e.g. deleting file from AWS bc the address is wrong/outdated)
+        router.push(
+          `/editDish?id=${id}&title=${title}&imgUrl=${imgUrl}&category=${category}&calories=${calories}&difficulty=${difficulty}`,
+          { scroll: false },
+        );
       }
-      // 5. Finally, reload the page. This is important, because after first edit the data in state and from query params are outdated (the query params will still point to the old imgURL). A second edit would not work, e.g. deleting file from AWS bc the address is wrong/outdated)
-      router.push(
-        `/editDish?id=${id}&title=${title}&imgUrl=${imgUrl}&category=${category}&calories=${calories}&difficulty=${difficulty}`,
-        { scroll: false },
-      );
     });
   }
   // #region Effects
@@ -333,4 +336,3 @@ export default function EditDishPage({
     </>
   );
 }
-// TODO: Make sure the old picture is deleted from AWS S3 when the new one is uploaded

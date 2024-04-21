@@ -1,17 +1,17 @@
+import type { Dish } from "@/types/types";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
-import { Dish } from "@/types/types";
 import { getLikedDishesFromSessionStorage, toggleLike } from "@/utils/favs";
 import { getIcon } from "@/utils/display";
 import { Heart } from "lucide-react";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import DishCard from "../organisms/DishCard";
 import {
   Modal,
   ModalContent,
   ModalBody,
   useDisclosure,
 } from "@nextui-org/react";
-import DishCard from "../organisms/DishCard";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
 
 export default function FavsCard({ dish }: { dish: Dish }) {
   // #region State & Effects
@@ -92,12 +92,7 @@ export default function FavsCard({ dish }: { dish: Dish }) {
           {(onClose) => (
             <>
               <ModalBody>
-                <DishCard
-                  retrievedDish={dish}
-                  isImageLoaded={true}
-                  setRetrievedDish={() => {}}
-                  setIsImageLoaded={() => {}}
-                />
+                <DishCard retrievedDish={dish} isImageLoaded={true} />
               </ModalBody>
             </>
           )}

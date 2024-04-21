@@ -7,18 +7,21 @@ import Link from "next/link";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
 import { getIcon } from "@/utils/display";
 import { deleteDishFromDb, deleteImgFromAWS } from "@/actions/actions";
+import { usePathname, useRouter } from "next/navigation";
 
 type DishCardProps = {
   retrievedDish: Dish;
   isImageLoaded: boolean;
-  setRetrievedDish: (dish: Dish | null) => void;
-  setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
+  setRetrievedDish?: (dish: Dish | null) => void;
+  setIsImageLoaded?: React.Dispatch<React.SetStateAction<boolean>>;
+  setDeleteOutcome?: React.Dispatch<React.SetStateAction<string>>;
 };
 export default function DishCard({
   retrievedDish,
   isImageLoaded,
   setRetrievedDish,
   setIsImageLoaded,
+  setDeleteOutcome,
 }: DishCardProps) {
   // Create ref to scroll to once Recipe is loaded
   const recipeCardRef = useRef<HTMLDivElement>(null);
@@ -33,6 +36,8 @@ export default function DishCard({
   } = retrievedDish;
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   // #region Effects
   useEffect(() => {
@@ -94,7 +99,9 @@ export default function DishCard({
             alt={title}
             fill
             style={{ objectFit: "contain" }}
-            onLoad={() => setIsImageLoaded(true)}
+            onLoad={() => {
+              if (setIsImageLoaded) setIsImageLoaded(true);
+            }}
           />
         </div>
       )}
@@ -144,10 +151,20 @@ export default function DishCard({
               try {
                 imgUrl && (await deleteImgFromAWS(imgUrl));
                 await deleteDishFromDb(id);
-                // Hide dish card after deleting
-                setRetrievedDish(null);
+                // If DishCard is shown on index page, hide dish card after deleting
+                if (pathname === "/") {
+                  setRetrievedDish && setRetrievedDish(null);
+                  setDeleteOutcome && setDeleteOutcome("success");
+                } else if (pathname === "/favs") {
+                  // if coming from favs page, delete the dish from favs in sessionStorage and refresh the page to show updated list w/o the just deleted dish
+                  toggleLike(retrievedDish);
+                  router.refresh();
+                }
               } catch (error) {
                 console.error(error);
+                if (pathname === "/") {
+                  setDeleteOutcome && setDeleteOutcome("fail");
+                }
               }
             }
           }}
@@ -159,4 +176,4 @@ export default function DishCard({
   );
 }
 
-// TODO: add feedback for user after deleting dish ("dish deleted" or smth)
+// TODO: add feedback for user if there is an error when deleting dish coming from favs page (error on index page is already handled)

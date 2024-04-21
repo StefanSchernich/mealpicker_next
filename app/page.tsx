@@ -21,9 +21,11 @@ export default function IndexPage() {
   const [retrievedDish, setRetrievedDish] = useState<Dish | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [noDishWithGivenFilter, setNoDishWithGivenFilter] = useState(false);
+  const [deleteOutcome, setDeleteOutcome] = useState("");
   const [numberOfLikedDishes, setNumberOfLikedDishes] = useState(0);
 
   const noDishFoundComponentRef = useRef<HTMLDivElement>(null);
+  const deleteOutcomeComponentRef = useRef<HTMLDivElement>(null);
 
   // #region Handlers
   function handleCategoryChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -150,12 +152,25 @@ export default function IndexPage() {
           isImageLoaded={isImageLoaded}
           setIsImageLoaded={setIsImageLoaded}
           setRetrievedDish={setRetrievedDish}
+          setDeleteOutcome={setDeleteOutcome}
         />
       )}
 
       {noDishWithGivenFilter && (
         <Notification ref={noDishFoundComponentRef} type="fail">
           Kein Gericht mit diesen Kriterien gefunden.
+        </Notification>
+      )}
+
+      {deleteOutcome === "success" && (
+        <Notification ref={deleteOutcomeComponentRef} type="success">
+          Gericht gelöscht.
+        </Notification>
+      )}
+
+      {deleteOutcome === "fail" && (
+        <Notification ref={deleteOutcomeComponentRef} type="fail">
+          Fehler beim Löschen des Gericht.
         </Notification>
       )}
 

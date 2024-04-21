@@ -1,5 +1,4 @@
 // Thise file contains helpers to deal with AWS S3 for uploading / deleting files
-// TODO: Uninstall old aws sdk
 import axios from "axios";
 
 /**
