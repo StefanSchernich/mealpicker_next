@@ -14,8 +14,8 @@ export default function FilterOptionCheckbox({
   changeHandler,
 }: FilterOptionCheckboxProps) {
   return (
-    <div className="flex flex-col gap-2 rounded-md border border-gray-800 p-3 transition-colors hover:bg-slate-700 has-[:checked]:bg-slate-700">
-      <label htmlFor={value}>
+    <div className="flex flex-col gap-2 rounded-md border border-gray-800 transition-colors hover:bg-slate-800 has-[:checked]:bg-slate-700">
+      <label htmlFor={value} className="p-3">
         {icon} {value}
       </label>
       <input

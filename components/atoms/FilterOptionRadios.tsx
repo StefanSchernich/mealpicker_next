@@ -16,8 +16,8 @@ export default function FilterOptionRadios({
   isRequired,
 }: FilterOptionsRadio) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-gray-800 p-3 text-center transition-colors hover:bg-slate-700 has-[:checked]:bg-slate-700">
-      <label htmlFor={value}>
+    <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-gray-800 text-center transition-colors hover:bg-slate-800 has-[:checked]:bg-slate-700">
+      <label htmlFor={value} className="p-3">
         {icon} {value}
       </label>
       <input
