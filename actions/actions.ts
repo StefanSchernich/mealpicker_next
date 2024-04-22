@@ -36,16 +36,15 @@ export async function getSignedRequest({
 }: {
   compressedImg: globalThis.File;
 }) {
-  // const file = formData.get("file") as globalThis.File | null;
   if (!file) throw new Error("Keine Datei ausgewählt");
   // if no fileName is provided, generate a random file name
   const fileName = file.name || uuidv4();
   const fileType = file.type;
   const putCmd = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileName!,
+    Key: fileName,
     ACL: "public-read",
-    ContentType: fileType!,
+    ContentType: fileType,
   });
 
   try {

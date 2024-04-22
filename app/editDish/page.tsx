@@ -136,13 +136,11 @@ export default function EditDishPage({
         });
 
         try {
-          // add file to form (getSignedRequest only accepts plain objects or FormData as argument)
-          // const imgFormData = new FormData();
-          // imgFormData.append("file", compressedImg);
-          // 1b: Get signedRequest and URL of uploaded image from AWS
+          // add file to form (getSignedRequest only accepts plain objects or FormData as argument); JSON.parse + JSON.stringify creates a serializable (= plain) object that can be sent to the server
           const fileObj = JSON.parse(
             JSON.stringify({ compressedImg: compressedImg }),
           );
+          // 1b: Get signedRequest and URL of uploaded image from AWS
           const { signedRequest, uploadedImgUrlInAWS } =
             await getSignedRequest(fileObj);
           imgUrl = uploadedImgUrlInAWS;
