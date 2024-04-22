@@ -1,11 +1,18 @@
 "use server";
-
 import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { connectToDb, Recipe } from "@/db/db";
+import { FormDataObj } from "@/types/types";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+
+const client = new S3Client({
+  region: "eu-central-1",
+});
 
 type DishDocumentInDb = {
   title: string;
@@ -18,9 +25,44 @@ type DishDocumentInDb = {
   __v: number;
 };
 
-import { connectToDb, Recipe } from "@/db/db";
-import { FormDataObj } from "@/types/types";
-import axios from "axios";
+/**
+ * Retrieves a signed request from the server for uploading a file to AWS S3.
+ *
+ * @param {globalThis.File | null} file - The file to be uploaded
+ * @return {AxiosResponse} The response containing a "data" object, which contains the signedRequest (= URL with embedded credentials) for the file upload and the URL of the uploaded file in AWS S3
+ */
+export async function getSignedRequest({
+  compressedImg: file,
+}: {
+  compressedImg: globalThis.File;
+}) {
+  // const file = formData.get("file") as globalThis.File | null;
+  if (!file) throw new Error("Keine Datei ausgewählt");
+  // if no fileName is provided, generate a random file name
+  const fileName = file.name || uuidv4();
+  const fileType = file.type;
+  const putCmd = new PutObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: fileName!,
+    ACL: "public-read",
+    ContentType: fileType!,
+  });
+
+  try {
+    const signedRequest = await getSignedUrl(client, putCmd, {
+      expiresIn: 3600,
+    });
+    const returnData = {
+      signedRequest,
+      uploadedImgUrlInAWS: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`,
+    };
+
+    return returnData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
 /**
  * Add a new dish to the database based on the provided form data.

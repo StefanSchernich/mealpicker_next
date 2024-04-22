@@ -7,12 +7,16 @@ import RadioFilterSection from "@/components/molecules/RadioFilterSection";
 import SubmitBtn from "@/components/atoms/SubmitBtn";
 import Notification from "@/components/atoms/Notification";
 import { categoryOptions, caloryOptions, difficultyOptions } from "@/data/data";
-import { deleteImgFromAWS, editDishInDb } from "@/actions/actions";
+import {
+  getSignedRequest,
+  deleteImgFromAWS,
+  editDishInDb,
+} from "@/actions/actions";
 import {
   trimFreetextSearchTerms,
   handleIngredientAdd,
 } from "@/utils/dishProperties";
-import { getSignedRequest, uploadFile } from "@/utils/aws";
+import { uploadFile } from "@/utils/aws";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
@@ -132,11 +136,15 @@ export default function EditDishPage({
         });
 
         try {
+          // add file to form (getSignedRequest only accepts plain objects or FormData as argument)
+          // const imgFormData = new FormData();
+          // imgFormData.append("file", compressedImg);
           // 1b: Get signedRequest and URL of uploaded image from AWS
-          const {
-            data: { signedRequest, uploadedImgUrlInAWS },
-          }: { data: { signedRequest: string; uploadedImgUrlInAWS: string } } =
-            await getSignedRequest(compressedImg);
+          const fileObj = JSON.parse(
+            JSON.stringify({ compressedImg: compressedImg }),
+          );
+          const { signedRequest, uploadedImgUrlInAWS } =
+            await getSignedRequest(fileObj);
           imgUrl = uploadedImgUrlInAWS;
           // 1c: Upload the image file to the signedRequest URL provided by AWS
           await uploadFile(compressedImg, signedRequest);
