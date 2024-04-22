@@ -96,14 +96,11 @@ export default function AddDish() {
 
         try {
           // add file to form (getSignedRequest only accepts plain objects or FormData as argument)
-          // const imgFormData = new FormData();
-          // imgFormData.append("file", compressedImg);
+          const imgFormData = new FormData();
+          imgFormData.append("file", compressedImg);
           // 1b: Get signedRequest and URL of uploaded image from AWS
-          const fileObj = JSON.parse(
-            JSON.stringify({ compressedImg: compressedImg }),
-          );
           const { signedRequest, uploadedImgUrlInAWS } =
-            await getSignedRequest(fileObj);
+            await getSignedRequest(imgFormData);
           imgUrl = uploadedImgUrlInAWS;
           // 1c: Upload the image file to the signedRequest URL provided by AWS
           await uploadFile(compressedImg, signedRequest);

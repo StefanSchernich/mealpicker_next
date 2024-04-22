@@ -28,18 +28,14 @@ type DishDocumentInDb = {
 /**
  * Retrieves a signed request from the server for uploading a file to AWS S3.
  *
- * @param {globalThis.File | null} file - The file to be uploaded
- * @return {AxiosResponse} The response containing a "data" object, which contains the signedRequest (= URL with embedded credentials) for the file upload and the URL of the uploaded file in AWS S3
+ * @param {FormData} formData - The form data containing the file to be uploaded.
+ * @return {Promise<{signedRequest: string, uploadedImgUrlInAWS: string}>} The signed request and the URL of the uploaded file in AWS S3.
  */
-export async function getSignedRequest({
-  compressedImg: file,
-}: {
-  compressedImg: globalThis.File;
-}) {
-  // const file = formData.get("file") as globalThis.File | null;
-  if (!file) throw new Error("Keine Datei ausgewählt");
-  // if no fileName is provided, generate a random file name
-  const fileName = file.name || uuidv4();
+export async function getSignedRequest(formData: FormData) {
+  const blob = formData.get("file") as Blob | null;
+  if (!blob) throw new Error("Keine Datei ausgewählt");
+  const file = new File([blob], uuidv4(), { type: "image/jpeg" }) as File;
+  const fileName = file.name;
   const fileType = file.type;
   const putCmd = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
