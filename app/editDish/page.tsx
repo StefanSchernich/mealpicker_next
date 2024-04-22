@@ -142,7 +142,7 @@ export default function EditDishPage({
           );
           // 1b: Get signedRequest and URL of uploaded image from AWS
           const { signedRequest, uploadedImgUrlInAWS } =
-            await getSignedRequest(imgFormData);
+            await getSignedRequest(fileObj);
           imgUrl = uploadedImgUrlInAWS;
           // 1c: Upload the image file to the signedRequest URL provided by AWS
           await uploadFile(compressedImg, signedRequest);
