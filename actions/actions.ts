@@ -28,8 +28,8 @@ type DishDocumentInDb = {
 /**
  * Retrieves a signed request from the server for uploading a file to AWS S3.
  *
- * @param {FormData} formData - The form data containing the file to be uploaded.
- * @return {Promise<{signedRequest: string, uploadedImgUrlInAWS: string}>} The signed request and the URL of the uploaded file in AWS S3.
+ * @param {globalThis.File} compressedImg - The compressed image file to be uploaded.
+ * @return {Promise<{signedRequest: string, uploadedImgUrlInAWS: string}>} The signed request and the URL of the uploaded image in AWS S3.
  */
 export async function getSignedRequest({
   compressedImg: file,
@@ -38,6 +38,7 @@ export async function getSignedRequest({
 }) {
   if (!file) throw new Error("Keine Datei ausgewählt");
   // if no fileName is provided, generate a random file name
+  console.log(file);
   const fileName = file.name || uuidv4();
   const fileType = file.type;
   const putCmd = new PutObjectCommand({
@@ -53,7 +54,7 @@ export async function getSignedRequest({
     });
     const returnData = {
       signedRequest,
-      uploadedImgUrlInAWS: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`,
+      uploadedImgUrlInAWS: `${file}`,
     };
 
     return returnData;
