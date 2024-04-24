@@ -54,7 +54,7 @@ export async function getSignedRequest({
     });
     const returnData = {
       signedRequest,
-      uploadedImgUrlInAWS: `${file}`,
+      uploadedImgUrlInAWS: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`,
     };
 
     return returnData;
