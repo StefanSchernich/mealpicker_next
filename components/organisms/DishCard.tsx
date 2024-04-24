@@ -76,7 +76,7 @@ export default function DishCard({
   return (
     <div
       ref={recipeCardRef}
-      className="container mt-12 max-w-[500px] scroll-mt-12 space-y-8"
+      className="container mt-12 max-w-[450px] scroll-mt-12 space-y-8"
     >
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>
@@ -93,7 +93,6 @@ export default function DishCard({
           className={`relative h-auto min-h-60 w-full max-w-96 overflow-hidden rounded-3xl
           ${isImageLoaded ? "animate-none bg-none" : "animate-pulse bg-slate-400"}`}
         >
-          {/* TODO: add "sizes" to all Image components in the App (DishCard, Add/Edit Dish Page...) to improve performance */}
           <Image
             src={imgUrl}
             alt={title}

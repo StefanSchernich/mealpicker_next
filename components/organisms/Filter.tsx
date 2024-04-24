@@ -148,7 +148,7 @@ export default function Filter({
         //#region Kategorie/Kalorinen/Schwierigkeit Filter
       }
       <form onSubmit={handleSubmit}>
-        <fieldset className="flex flex-col justify-center gap-8">
+        <fieldset className="flex max-w-[500px] flex-col justify-center gap-8">
           <RadioFilterSection
             sectionName="category"
             state={category}

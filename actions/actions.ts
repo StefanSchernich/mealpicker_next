@@ -160,9 +160,6 @@ export async function deleteImgFromAWS(imgUrl?: string) {
   const fileName = matchResult?.[1];
   if (!fileName) return;
 
-  const client = new S3Client({
-    region: "eu-central-1",
-  });
   const deleteCmd = new DeleteObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileName,
@@ -174,5 +171,3 @@ export async function deleteImgFromAWS(imgUrl?: string) {
 
   await axios.delete(signedRequest);
 }
-
-// TODO: add replace action (should only delete old img if name is different. If name is the same, aws will automatically replace the image w/o changing the name)

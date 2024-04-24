@@ -226,7 +226,10 @@ export default function EditDishPage({
   return (
     <>
       <h1 className="mt-2 text-2xl font-bold">Gericht editieren</h1>
-      <form className="mt-6 flex flex-col gap-8" onSubmit={handleSubmit}>
+      <form
+        className="mt-6 flex max-w-[500px] flex-col gap-8"
+        onSubmit={handleSubmit}
+      >
         <div className="flex items-center gap-4">
           <label className="min-w-12" htmlFor="title">
             Titel
