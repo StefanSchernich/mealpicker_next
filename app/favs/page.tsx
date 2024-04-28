@@ -16,7 +16,7 @@ export default function Favs() {
   }, []);
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex max-w-[450px] items-center justify-between">
         <h1 className="text-xl font-bold">Favs</h1>
         <Link href="/">
           <CircleArrowLeft />
@@ -25,7 +25,7 @@ export default function Favs() {
       {likedDishes.length === 0 ? (
         <p>Keine Favs abgespeichert.</p>
       ) : (
-        <ul className="mt-4 flex flex-col divide-y divide-gray-800">
+        <ul className="mt-4 flex max-w-[450px] flex-col divide-y divide-gray-800">
           {likedDishes.map((dish) => (
             <li key={dish._id}>
               <FavsCard dish={dish} />
